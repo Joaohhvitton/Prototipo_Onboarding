@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Protótipo Onboarding | Funil + Lead</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">▦</div>
+        <nav>
+          <button class="nav-btn">⌂</button>
+          <button class="nav-btn active">▣</button>
+          <button class="nav-btn">◫</button>
+          <button class="nav-btn">⚙</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="main-header">
+          <h1>Funil de Vendas</h1>
+          <div class="header-actions">
+            <button class="btn btn-muted">Enviar Relatório</button>
+            <button id="openLeadButton" class="btn btn-primary">Criar Cliente Novo</button>
+          </div>
+        </header>
+
+        <section class="filters">
+          <input type="text" placeholder="Buscar por CNPJ" />
+          <input type="text" placeholder="__/__/____" />
+          <button class="btn btn-primary">Buscar</button>
+        </section>
+
+        <section class="kanban">
+          <article class="column" id="leadColumn">
+            <header><h2>Lead Novo</h2><span id="leadCount">0</span></header>
+            <p class="empty-state" id="leadEmptyState">Nenhum lead no momento.</p>
+            <div id="leadList" class="lead-list"></div>
+          </article>
+
+          <article class="column"><header><h2>Qualificação</h2><span>0</span></header></article>
+
+          <article class="column column-proposta">
+            <header><h2>Proposta</h2><span>1</span></header>
+            <div class="deal-card">
+              <h3>MERCADINHO RAMOS</h3>
+              <p><b>Parceiro:</b> Flex Pagamentos</p>
+              <p><b>Documento:</b> 37.163.989/0001-64</p>
+              <p><b>Vendedor:</b> João Vitor Oliveira de Lima</p>
+              <p><b>Cliente:</b> ANDRO DE OLIVEIRA RAMOS</p>
+              <p><b>Contato:</b> (77) 98854-1288</p>
+            </div>
+          </article>
+
+          <article class="column column-credenciado">
+            <header><h2>Credenciado</h2><span>1</span></header>
+            <div class="deal-card success">
+              <h3>ESQUINA VELOSO</h3>
+              <p><b>Parceiro:</b> Flex Pagamentos</p>
+              <p><b>Documento:</b> 21.653.392/0001-68</p>
+              <p><b>Vendedor:</b> João Vitor Oliveira de Lima</p>
+              <p><b>StoneCode:</b> 817621943</p>
+              <p><b>Tipo:</b> Aluguel</p>
+            </div>
+          </article>
+
+          <article class="column column-lost"><header><h2>Perdido</h2><span>0</span></header></article>
+        </section>
+      </main>
+
+      <section id="leadDrawer" class="lead-drawer" aria-hidden="true">
+        <header class="drawer-top">
+          <button id="minimizeLead" class="icon-btn" aria-label="Minimizar">—</button>
+          <ol class="stepper" id="stepper">
+            <li class="active" data-step="1"><span>1</span>Lead Novo</li>
+            <li data-step="2"><span>2</span>Qualificação</li>
+            <li data-step="3"><span>3</span>Proposta</li>
+            <li data-step="4"><span>4</span>Credenciado</li>
+            <li data-step="lost"><span>✕</span>Perdido</li>
+          </ol>
+          <button id="closeLead" class="icon-btn" aria-label="Fechar">✕</button>
+        </header>
+
+        <div class="drawer-content">
+          <h2 id="drawerTitle">Cliente Novo</h2>
+
+          <div class="panel" id="companyPanel">
+            <div class="panel-title">Dados iniciais da empresa <span>⌄</span></div>
+            <div class="panel-body">
+              <h3>Informações do estabelecimento</h3>
+              <form class="lead-form" id="leadForm">
+                <label>
+                  Documento (CPF ou CNPJ)
+                  <div class="doc-grid">
+                    <div class="input-wrap">
+                      <input id="doc" type="text" maxlength="18" placeholder="CPF ou CNPJ" />
+                      <small class="ok">✓</small>
+                    </div>
+                    <button id="cnpjLookup" class="btn btn-outline" type="button">Consultar CNPJ</button>
+                  </div>
+                  <small id="apiStatus" class="api-status"></small>
+                </label>
+
+                <label>
+                  Nome fantasia
+                  <input id="fantasy" type="text" placeholder="Informe o nome fantasia" />
+                </label>
+
+                <label>
+                  Razão social
+                  <input id="legalName" type="text" placeholder="Informe a razão social" />
+                </label>
+
+                <label>
+                  Ramo de atividade
+                  <input id="industry" type="text" placeholder="Informe o ramo de atividade" />
+                </label>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel hidden" id="confirmPanel">
+            <div class="panel-title">Confirmação final antes da Qualificação <span>⌄</span></div>
+            <div class="panel-body">
+              <h3>Dados do responsável e produto</h3>
+              <form class="lead-form confirm-form" id="confirmForm">
+                <label>
+                  Nome completo
+                  <input id="fullName" type="text" placeholder="Informe o nome completo" />
+                </label>
+
+                <label>
+                  Telefone
+                  <input id="phone" type="text" maxlength="15" placeholder="(00) 00000-0000" />
+                </label>
+
+                <label>
+                  Produto
+                  <select id="product">
+                    <option value="">Selecione o produto</option>
+                    <option value="adquirencia">Adquirência</option>
+                    <option value="tef-adquirencia">TEF + Adquirência</option>
+                    <option value="voucher-fisico">Voucher e Físico</option>
+                  </select>
+                </label>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel hidden" id="qualificationPanel">
+            <div class="panel-body panel-body--no-title">
+              <details class="qual-section">
+                <summary>Dados iniciais da empresa</summary>
+                <div class="qual-grid">
+                  <p><strong>Documento:</strong> <span id="qualDoc">-</span></p>
+                  <p><strong>Nome fantasia:</strong> <span id="qualFantasy">-</span></p>
+                  <p><strong>Responsável:</strong> <span id="qualOwner">-</span></p>
+                  <p><strong>Contato:</strong> <span id="qualPhone">-</span></p>
+                </div>
+              </details>
+
+              <details class="qual-section">
+                <summary>Dados para qualificar</summary>
+                <label class="qual-field">
+                  Faturamento bruto do PDV
+                  <div class="money-input">
+                    <span>R$</span>
+                    <input id="pdvRevenue" type="text" inputmode="numeric" placeholder="0,00" />
+                  </div>
+                </label>
+              </details>
+            </div>
+          </div>
+          <div class="panel hidden" id="proposalPanel">
+            <div class="panel-body panel-body--no-title">
+              <details class="qual-section">
+                <summary>Dados iniciais da empresa</summary>
+                <div class="qual-grid">
+                  <p><strong>Documento:</strong> <span id="proposalDoc">-</span></p>
+                  <p><strong>Nome fantasia:</strong> <span id="proposalFantasy">-</span></p>
+                  <p><strong>Responsável:</strong> <span id="proposalOwner">-</span></p>
+                  <p><strong>Contato:</strong> <span id="proposalPhone">-</span></p>
+                </div>
+              </details>
+
+              <details class="qual-section">
+                <summary>Dados para qualificar</summary>
+                <div class="qual-grid">
+                  <p><strong>Faturamento bruto do PDV:</strong> <span id="proposalRevenue">-</span></p>
+                  <p><strong>Produto:</strong> <span id="proposalProduct">-</span></p>
+                </div>
+              </details>
+
+              <details class="qual-section" open>
+                <summary>Ofertas</summary>
+                <div class="offers-grid offers-grid--proposal">
+                  <article class="offer-card offer-card--model">
+                    <div class="offer-badge">Mais Vendido</div>
+                    <h4><strong>Antecipação Automática</strong></h4>
+                    <ul>
+                      <li>✓ Antecipação automática</li>
+                      <li>✓ Isenção por volume</li>
+                    </ul>
+
+                    <div class="rate-table">
+                      <div class="rate-head">DÉBITO</div><div class="rate-head">À VISTA</div><div class="rate-head">2 A 6X</div><div class="rate-head">7 A 12X</div>
+                      <div>0,89%</div><div>1,90%</div><div>2,53%</div><div>2,70%</div>
+                    </div>
+                    <div class="offer-brands" aria-label="Bandeiras">
+                      <img class="brand-logo" src="assets/bandeira-mastercard.png" alt="Mastercard" />
+                      <img class="brand-logo" src="assets/bandeira-visa.png" alt="Visa" />
+                      <img class="brand-logo" src="assets/bandeira-elo.png" alt="Elo" />
+                    </div>
+
+                    <div class="offer-footer-grid">
+                      <p><strong>Antecipação:</strong> Automática 1,65%</p>
+                      <div><strong>Terminais:</strong><div class="terminal-sim"><img class="machine-thumb" src="https://drive.google.com/thumbnail?id=1lSzjiMadueKbkTRJVUpWvbX8ck9vkbr1&sz=w320" alt="Terminal SmartPOS Redeflex" onerror="this.onerror=null;this.src='assets/terminal-redeflex.svg';" /><span class="terminal-name">SmartPOS</span><span class="terminal-price">R$ 139,90</span></div></div>
+                      <p><strong>PIX:</strong> R$ 0,69</p>
+                    </div>
+                  </article>
+
+                  <article class="offer-card offer-card--model">
+                    <h4><strong>Sem</strong> Antecipação Automática</h4>
+                    <ul>
+                      <li>• Antecipação automática</li>
+                      <li>✓ Isenção por volume</li>
+                    </ul>
+
+                    <div class="rate-table">
+                      <div class="rate-head">DÉBITO</div><div class="rate-head">À VISTA</div><div class="rate-head">2 A 6X</div><div class="rate-head">7 A 12X</div>
+                      <div>0,89%</div><div>1,90%</div><div>2,53%</div><div>2,70%</div>
+                    </div>
+                    <div class="offer-brands" aria-label="Bandeiras">
+                      <img class="brand-logo" src="assets/bandeira-mastercard.png" alt="Mastercard" />
+                      <img class="brand-logo" src="assets/bandeira-visa.png" alt="Visa" />
+                      <img class="brand-logo" src="assets/bandeira-elo.png" alt="Elo" />
+                    </div>
+
+                    <div class="offer-footer-grid">
+                      <p><strong>Antecipação:</strong> Automática 2,99%</p>
+                      <div><strong>Terminais:</strong><div class="terminal-sim"><img class="machine-thumb" src="https://drive.google.com/thumbnail?id=1lSzjiMadueKbkTRJVUpWvbX8ck9vkbr1&sz=w320" alt="Terminal SmartPOS Redeflex" onerror="this.onerror=null;this.src='assets/terminal-redeflex.svg';" /><span class="terminal-name">SmartPOS</span><span class="terminal-price">R$ 139,90</span></div></div>
+                      <p><strong>PIX:</strong> R$ 0,69</p>
+                    </div>
+                  </article>
+                </div>
+              </details>
+
+              <details class="qual-section" open>
+                <summary>Simular oferta selecionada</summary>
+                <div class="proposal-simulate">
+                  <p class="simulate-hint">Clique em "Simular" para prosseguir</p>
+                  <div class="simulate-layout">
+                    <div class="simulate-card">
+                      <div class="brand-rates">
+                        <div class="brand-row brand-head"><span>Bandeira</span><span>Débito</span><span>À vista</span><span>2 a 6x</span><span>7 a 12x</span></div>
+                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="assets/bandeira-mastercard.png" alt="Mastercard" /></span><span>1,58%</span><span>2,51%</span><span>2,98%</span><span>3,24%</span></div>
+                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="assets/bandeira-visa.png" alt="Visa" /></span><span>1,59%</span><span>2,67%</span><span>2,81%</span><span>3,16%</span></div>
+                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="assets/bandeira-elo.png" alt="Elo" /></span><span>2,03%</span><span>3,22%</span><span>2,89%</span><span>3,36%</span></div>
+                      </div>
+                    </div>
+                    <div class="simulate-card simulate-card--aside">
+                      <div class="simulate-kv"><strong>Antecipação</strong><span>Automática 2,03%</span></div>
+                      <div class="simulate-kv"><strong>Eventual</strong><span>2,63%</span></div>
+                      <div class="simulate-kv"><strong>PIX</strong><span>0,75%</span></div>
+                      <div class="simulate-kv"><strong>Taxa fixa</strong><span>0,75</span></div>
+                    </div>
+                  </div>
+
+                  <div class="simulate-machine">
+                    <div class="simulate-machine__head"><strong>Máquina Stone</strong><strong>Aluguel zero</strong></div>
+                    <div class="simulate-machine__grid">
+                      <label>Tipo de máquina<input type="text" value="POS" readonly /></label>
+                      <label>Modelo<input type="text" value="SmartPOS" readonly /></label>
+                      <label>Quantidade<input type="text" value="1" readonly /></label>
+                      <label>Mensalidade<input type="text" value="R$ 79,90" readonly /></label>
+                      <label>Isenção<input type="text" value="0" readonly /></label>
+                      <button class="btn btn-primary" type="button">Adicionar</button>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="qual-section" open>
+                <summary>Dados do cliente</summary>
+                <div class="proposal-form-grid">
+                  <label>CPF<input type="text" placeholder="Preencha com CPF" /></label>
+                  <label>Email do cliente<input type="email" placeholder="Preencha o email" /></label>
+                  <label>Data de nascimento<input type="text" placeholder="dd / mm / aaaa" /></label>
+                  <label>Ocupação<input type="text" placeholder="Informe a ocupação" /></label>
+                  <label>Renda mensal<input type="text" placeholder="Informe a renda" /></label>
+                </div>
+                <h4 class="subsection-title">Endereço</h4>
+                <div class="proposal-form-grid">
+                  <label>CEP<input type="text" placeholder="Preencha o CEP" /></label>
+                  <label>Estado<input type="text" placeholder="UF" /></label>
+                  <label>Cidade<input type="text" placeholder="Preencha a cidade" /></label>
+                  <label>Bairro<input type="text" placeholder="Preencha o bairro" /></label>
+                  <label>Logradouro<input type="text" placeholder="Preencha o logradouro" /></label>
+                  <label>Número<input type="text" placeholder="Preencha o número" /></label>
+                  <label>Complemento<input type="text" placeholder="Preencha o complemento" /></label>
+                  <label>Referência<input type="text" placeholder="Preencha a referência" /></label>
+                </div>
+              </details>
+
+              <details class="qual-section" open>
+                <summary>Horário de funcionamento</summary>
+                <div class="hours-row">
+                  <span class="radio-chip active">Horário comercial</span>
+                  <span class="radio-chip">24 horas</span>
+                  <span class="radio-chip">Personalizado</span>
+                </div>
+                <div class="hours-time">
+                  <label>Segunda a sexta <input type="text" value="09:00" readonly /></label>
+                  <label>&nbsp;<input type="text" value="18:00" readonly /></label>
+                </div>
+              </details>
+
+              <details class="qual-section" open>
+                <summary>Recebimento de Vendas</summary>
+                <p class="info-banner">Os dados preenchidos devem corresponder aos do documento do responsável e verificação de identidade na abertura da Conta Stone.</p>
+                <div class="proposal-form-grid">
+                  <label>CPF do sócio<input type="text" placeholder="080.058.131-80" /></label>
+                  <label>Nome do sócio<input type="text" placeholder="João Vitor" /></label>
+                  <label>Email<input type="email" placeholder="email@exemplo.com" /></label>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <footer class="drawer-footer">
+          <small id="saveStatus" class="api-status"></small>
+
+          <div class="footer-actions" id="confirmActions">
+            <button id="backToCompany" class="btn btn-muted hidden" type="button">Voltar</button>
+            <button id="saveLeadData" class="btn btn-outline hidden" type="button">Salvar dados</button>
+            <button id="sendToQualification" class="btn btn-primary hidden" type="button">Enviar para Qualificação</button>
+            <button id="createClient" class="btn btn-primary" type="button">Criar Cliente</button>
+          </div>
+
+          <div class="footer-actions hidden" id="qualificationActions">
+            <button id="loseOpportunity" class="btn btn-danger" type="button">Perder Oportunidade</button>
+            <button id="saveQualification" class="btn btn-muted" type="button">Salvar Dados</button>
+            <button id="generateProposal" class="btn btn-primary" type="button">Gerar Proposta</button>
+          </div>
+
+          <div class="footer-actions hidden" id="proposalActions">
+            <button id="loseOpportunityProposal" class="btn btn-danger" type="button">Perder Oportunidade</button>
+            <button id="saveProposalData" class="btn btn-muted" type="button">Salvar Dados</button>
+            <button id="approveProposal" class="btn btn-primary" type="button">Credenciar</button>
+          </div>
+        </footer>
+      </section>
+    </div>
+
+    <script>
+      const root = document.documentElement;
+      const drawer = document.getElementById('leadDrawer');
+      const openLeadButton = document.getElementById('openLeadButton');
+      const minimizeLead = document.getElementById('minimizeLead');
+      const closeLead = document.getElementById('closeLead');
+
+      const drawerTitle = document.getElementById('drawerTitle');
+      const companyPanel = document.getElementById('companyPanel');
+      const confirmPanel = document.getElementById('confirmPanel');
+      const qualificationPanel = document.getElementById('qualificationPanel');
+      const proposalPanel = document.getElementById('proposalPanel');
+      const backToCompany = document.getElementById('backToCompany');
+      const stepper = document.getElementById('stepper');
+
+      const confirmActions = document.getElementById('confirmActions');
+      const qualificationActions = document.getElementById('qualificationActions');
+      const proposalActions = document.getElementById('proposalActions');
+
+      const leadCount = document.getElementById('leadCount');
+      const leadList = document.getElementById('leadList');
+      const leadEmptyState = document.getElementById('leadEmptyState');
+
+      const doc = document.getElementById('doc');
+      const fantasy = document.getElementById('fantasy');
+      const legalName = document.getElementById('legalName');
+      const industry = document.getElementById('industry');
+      const cnpjLookup = document.getElementById('cnpjLookup');
+      const apiStatus = document.getElementById('apiStatus');
+      const createClient = document.getElementById('createClient');
+      const saveStatus = document.getElementById('saveStatus');
+
+      const saveLeadData = document.getElementById('saveLeadData');
+      const sendToQualification = document.getElementById('sendToQualification');
+
+      const fullName = document.getElementById('fullName');
+      const phone = document.getElementById('phone');
+      const product = document.getElementById('product');
+
+      const qualDoc = document.getElementById('qualDoc');
+      const qualFantasy = document.getElementById('qualFantasy');
+      const qualOwner = document.getElementById('qualOwner');
+      const qualPhone = document.getElementById('qualPhone');
+      const proposalDoc = document.getElementById('proposalDoc');
+      const proposalFantasy = document.getElementById('proposalFantasy');
+      const proposalOwner = document.getElementById('proposalOwner');
+      const proposalPhone = document.getElementById('proposalPhone');
+      const proposalRevenue = document.getElementById('proposalRevenue');
+      const proposalProduct = document.getElementById('proposalProduct');
+      const pdvRevenue = document.getElementById('pdvRevenue');
+      const saveQualification = document.getElementById('saveQualification');
+      const loseOpportunity = document.getElementById('loseOpportunity');
+      const generateProposal = document.getElementById('generateProposal');
+      const loseOpportunityProposal = document.getElementById('loseOpportunityProposal');
+      const saveProposalData = document.getElementById('saveProposalData');
+      const approveProposal = document.getElementById('approveProposal');
+
+      let leadNumber = 0;
+
+      const setActiveStep = (step) => {
+        stepper.querySelectorAll('li').forEach((item) => item.classList.remove('active'));
+        const target = stepper.querySelector(`li[data-step="${step}"]`);
+        if (target) target.classList.add('active');
+      };
+
+      const showCompanyStep = () => {
+        drawerTitle.textContent = 'Cliente Novo';
+        companyPanel.classList.remove('hidden');
+        confirmPanel.classList.add('hidden');
+        qualificationPanel.classList.add('hidden');
+        proposalPanel.classList.add('hidden');
+        backToCompany.classList.add('hidden');
+        saveLeadData.classList.add('hidden');
+        sendToQualification.classList.add('hidden');
+        sendToQualification.disabled = false;
+        createClient.classList.remove('hidden');
+        createClient.disabled = false;
+        confirmActions.classList.remove('hidden');
+        qualificationActions.classList.add('hidden');
+        proposalActions.classList.add('hidden');
+        setActiveStep('1');
+      };
+
+      const showConfirmStep = () => {
+        companyPanel.classList.add('hidden');
+        confirmPanel.classList.remove('hidden');
+        qualificationPanel.classList.add('hidden');
+        proposalPanel.classList.add('hidden');
+        backToCompany.classList.remove('hidden');
+        saveLeadData.classList.remove('hidden');
+        sendToQualification.classList.remove('hidden');
+        createClient.classList.add('hidden');
+        confirmActions.classList.remove('hidden');
+        qualificationActions.classList.add('hidden');
+        proposalActions.classList.add('hidden');
+      };
+
+      const showQualificationStep = () => {
+        drawerTitle.textContent = `${fullName.value.trim() || 'Cliente'} - ${doc.value || '-'}`;
+        companyPanel.classList.add('hidden');
+        confirmPanel.classList.add('hidden');
+        qualificationPanel.classList.remove('hidden');
+        proposalPanel.classList.add('hidden');
+        confirmActions.classList.add('hidden');
+        qualificationActions.classList.remove('hidden');
+        proposalActions.classList.add('hidden');
+        setActiveStep('2');
+
+        qualDoc.textContent = doc.value || '-';
+        qualFantasy.textContent = fantasy.value || legalName.value || '-';
+        qualOwner.textContent = fullName.value || '-';
+        qualPhone.textContent = phone.value || '-';
+      };
+
+
+      const showProposalStep = () => {
+        drawerTitle.textContent = `${fullName.value.trim() || 'Cliente'} - ${doc.value || '-'}`;
+        companyPanel.classList.add('hidden');
+        confirmPanel.classList.add('hidden');
+        qualificationPanel.classList.add('hidden');
+        proposalPanel.classList.remove('hidden');
+        confirmActions.classList.add('hidden');
+        qualificationActions.classList.add('hidden');
+        proposalActions.classList.remove('hidden');
+        setActiveStep('3');
+
+        proposalDoc.textContent = doc.value || '-';
+        proposalFantasy.textContent = fantasy.value || legalName.value || '-';
+        proposalOwner.textContent = fullName.value || '-';
+        proposalPhone.textContent = phone.value || '-';
+        proposalRevenue.textContent = pdvRevenue.value ? `R$ ${pdvRevenue.value}` : '-';
+
+        const productMap = {
+          adquirencia: 'Adquirência',
+          'tef-adquirencia': 'TEF + Adquirência',
+          'voucher-fisico': 'Voucher e Físico',
+        };
+        proposalProduct.textContent = productMap[product.value] || '-';
+      };
+      const openDrawer = () => {
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden', 'false');
+        showCompanyStep();
+      };
+
+      const closeDrawerFn = () => {
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+      };
+
+      const formatCpf = (digits) =>
+        digits
+          .replace(/(\d{3})(\d)/, '$1.$2')
+          .replace(/(\d{3})(\d)/, '$1.$2')
+          .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+
+      const formatCnpj = (digits) =>
+        digits
+          .replace(/^(\d{2})(\d)/, '$1.$2')
+          .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+          .replace(/\.(\d{3})(\d)/, '.$1/$2')
+          .replace(/(\d{4})(\d)/, '$1-$2');
+
+      const formatDocumento = (value) => {
+        const digits = value.replace(/\D/g, '').slice(0, 14);
+        if (digits.length <= 11) return formatCpf(digits);
+        return formatCnpj(digits);
+      };
+
+      const formatPhone = (value) => {
+        const digits = value.replace(/\D/g, '').slice(0, 11);
+
+        if (digits.length <= 10) {
+          return digits
+            .replace(/^(\d{2})(\d)/, '($1) $2')
+            .replace(/(\d{4})(\d)/, '$1-$2');
+        }
+
+        return digits
+          .replace(/^(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{5})(\d)/, '$1-$2');
+      };
+
+      const formatCurrency = (value) => {
+        const digits = value.replace(/\D/g, '');
+        if (!digits) return '';
+        const number = Number(digits) / 100;
+        return number.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      };
+
+      const getDocDigits = () => doc.value.replace(/\D/g, '');
+
+      const populateFromApi = (data) => {
+        fantasy.value = data.nome_fantasia || '';
+        legalName.value = data.razao_social || '';
+
+        const cnae = data.cnae_fiscal_descricao || '';
+        const cnaeCode = data.cnae_fiscal || '';
+        industry.value = cnaeCode && cnae ? `${cnaeCode} - ${cnae}` : cnae || cnaeCode;
+        root.classList.add('is-filled');
+      };
+
+      const validateConfirmStep = () => {
+        if (!fullName.value.trim() || phone.value.replace(/\D/g, '').length < 10 || !product.value) {
+          saveStatus.textContent = 'Preencha nome completo, telefone e produto para continuar.';
+          return false;
+        }
+        return true;
+      };
+
+      const saveLeadCard = () => {
+        if (!validateConfirmStep()) return;
+
+        leadNumber += 1;
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'open-lead-card';
+
+        const fantasyName = fantasy.value.trim() || 'Nome fantasia não informado';
+        card.innerHTML = `<strong>${fantasyName}</strong><small>${doc.value}</small>`;
+
+        leadList.prepend(card);
+        leadCount.textContent = String(leadNumber);
+        leadEmptyState.classList.add('hidden');
+
+        saveStatus.textContent = 'Dados salvos no card de Lead Novo.';
+      };
+
+      openLeadButton.addEventListener('click', openDrawer);
+      minimizeLead.addEventListener('click', closeDrawerFn);
+      closeLead.addEventListener('click', closeDrawerFn);
+      backToCompany.addEventListener('click', showCompanyStep);
+      saveLeadData.addEventListener('click', saveLeadCard);
+
+      leadList.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target.classList.contains('open-lead-card')) {
+          openDrawer();
+        }
+      });
+
+      doc.addEventListener('input', () => {
+        doc.value = formatDocumento(doc.value);
+        apiStatus.textContent = '';
+        saveStatus.textContent = '';
+      });
+
+      phone.addEventListener('input', () => {
+        phone.value = formatPhone(phone.value);
+      });
+
+      pdvRevenue.addEventListener('input', () => {
+        pdvRevenue.value = formatCurrency(pdvRevenue.value);
+      });
+
+      cnpjLookup.addEventListener('click', async () => {
+        const digits = getDocDigits();
+
+        if (digits.length === 11) {
+          apiStatus.textContent = 'CPF é permitido para cadastro, mas a consulta automática funciona apenas para CNPJ.';
+          return;
+        }
+
+        if (digits.length !== 14) {
+          apiStatus.textContent = 'Informe um CNPJ válido com 14 dígitos para consultar.';
+          root.classList.remove('is-filled');
+          return;
+        }
+
+        apiStatus.textContent = 'Consultando CNPJ na API pública...';
+
+        try {
+          const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`);
+
+          if (!response.ok) {
+            throw new Error('CNPJ não encontrado na Receita/BR API.');
+          }
+
+          const data = await response.json();
+          populateFromApi(data);
+          apiStatus.textContent = 'Consulta concluída com sucesso.';
+        } catch (error) {
+          apiStatus.textContent = error.message;
+        }
+      });
+
+      createClient.addEventListener('click', () => {
+        const digits = getDocDigits();
+
+        if (digits.length !== 11 && digits.length !== 14) {
+          saveStatus.textContent = 'Para cadastrar, informe um CPF (11) ou CNPJ (14) válido.';
+          return;
+        }
+
+        saveStatus.textContent = 'Cadastro base concluído. Escolha: salvar dados, enviar para Qualificação ou voltar.';
+        showConfirmStep();
+      });
+
+      sendToQualification.addEventListener('click', () => {
+        if (!validateConfirmStep()) return;
+        saveStatus.textContent = 'Etapa de Qualificação aberta. Informe o faturamento bruto do PDV.';
+        showQualificationStep();
+      });
+
+      saveQualification.addEventListener('click', () => {
+        if (!pdvRevenue.value.trim()) {
+          saveStatus.textContent = 'Informe o faturamento bruto do PDV para salvar.';
+          return;
+        }
+        saveStatus.textContent = 'Dados da Qualificação salvos com sucesso.';
+      });
+
+      loseOpportunity.addEventListener('click', () => {
+        setActiveStep('lost');
+        saveStatus.textContent = 'Oportunidade marcada como perdida.';
+      });
+
+      generateProposal.addEventListener('click', () => {
+        if (!pdvRevenue.value.trim()) {
+          saveStatus.textContent = 'Preencha o faturamento bruto do PDV antes de gerar proposta.';
+          return;
+        }
+        saveStatus.textContent = 'Etapa de Proposta aberta com ofertas pré-aprovadas.';
+        showProposalStep();
+      });
+
+      saveProposalData.addEventListener('click', () => {
+        saveStatus.textContent = 'Dados da proposta salvos (protótipo).';
+      });
+
+      loseOpportunityProposal.addEventListener('click', () => {
+        setActiveStep('lost');
+        saveStatus.textContent = 'Oportunidade marcada como perdida.';
+      });
+
+      approveProposal.addEventListener('click', () => {
+        setActiveStep('4');
+        saveStatus.textContent = 'Cliente credenciado com sucesso (protótipo).';
+      });
+
+    </script>
+  </body>
+</html>
