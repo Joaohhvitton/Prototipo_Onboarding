@@ -976,6 +976,93 @@ body {
 }
 
 
+@media (max-width: 600px) {
+  .main { padding: 10px; }
+  .main-header h1 { font-size: 1.55rem; }
+  .header-actions,
+  .filters { width: 100%; }
+  .header-actions { flex-direction: column; }
+  .header-actions .btn,
+  .filters .btn,
+  .filters input { width: 100%; min-width: 0; }
+
+  .lead-drawer { width: 100vw; }
+  .drawer-top {
+    grid-template-columns: 32px 1fr 32px;
+    height: auto;
+    min-height: 62px;
+    padding: 8px;
+  }
+  .stepper {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+  .stepper li {
+    flex: 0 0 auto;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  .stepper li span {
+    width: 24px;
+    height: 24px;
+    font-size: 0.74rem;
+  }
+
+  .drawer-content { padding: 10px 8px; }
+  .drawer-content h2 { font-size: 1.15rem; }
+  .panel-title { font-size: 0.92rem; padding: 8px 10px; }
+  .panel-body { padding: 8px 9px 10px; }
+
+  .rate-table,
+  .offer-rates__head,
+  .offer-rates__row,
+  .brand-row {
+    font-size: 0.74rem;
+    gap: 4px;
+  }
+
+  .simulate-card,
+  .offer-card,
+  .credited-card { padding: 8px; }
+
+  .offer-info-grid { grid-template-columns: 1fr; }
+  .terminal-sim {
+    grid-template-columns: 28px 1fr;
+  }
+  .terminal-price {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+
+  .footer-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  .footer-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .main-header h1 { font-size: 1.35rem; }
+  .column h2 { font-size: 0.95rem; }
+  .deal-card h3 { font-size: 1rem; }
+  .deal-card p,
+  .offer-panel p,
+  .proposal-form-grid input,
+  .proposal-form-grid label,
+  .lead-form label {
+    font-size: 0.82rem;
+  }
+
+  .offer-brand .brand-logo { width: 44px; }
+  .machine-thumb { width: 22px; height: 30px; }
+}
+
+
+
 .footer-actions { display: flex; gap: 8px; }
 
 .btn:disabled { opacity: 0.65; cursor: not-allowed; }
