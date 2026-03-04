@@ -52,7 +52,7 @@
             <header><h2>Proposta</h2><span>1</span></header>
             <div class="deal-card">
               <h3>MERCADINHO RAMOS</h3>
-              <p><b>Parceiro:</b> Flex Pagamentos</p>
+              <p><b>Filial:</b> Flex Pagamentos</p>
               <p><b>Documento:</b> 37.163.989/0001-64</p>
               <p><b>Vendedor:</b> João Vitor Oliveira de Lima</p>
               <p><b>Cliente:</b> ANDRO DE OLIVEIRA RAMOS</p>
@@ -61,14 +61,17 @@
           </article>
 
           <article class="column column-credenciado">
-            <header><h2>Credenciado</h2><span>1</span></header>
-            <div class="deal-card success">
-              <h3>ESQUINA VELOSO</h3>
-              <p><b>Parceiro:</b> Flex Pagamentos</p>
-              <p><b>Documento:</b> 21.653.392/0001-68</p>
-              <p><b>Vendedor:</b> João Vitor Oliveira de Lima</p>
-              <p><b>StoneCode:</b> 817621943</p>
-              <p><b>Tipo:</b> Aluguel</p>
+            <header><h2>Credenciado</h2><span id="creditedCount">1</span></header>
+            <div id="creditedCards">
+              <div class="deal-card success open-credited-card">
+                <h3>ESQUINA VELOSO</h3>
+                <p><b>Filial:</b> Flex Pagamentos</p>
+                <p><b>Tipo:</b> Adquirente</p>
+                <p><b>Vendedor:</b> João Vitor Oliveira de Lima</p>
+                <p><b>Documento:</b> 21.653.392/0001-68</p>
+                <div class="credited-model-status">Liberado para instalação</div>
+                <div class="credited-model-date">📅 Data de lançamento/liberação: 04/03/2026</div>
+              </div>
             </div>
           </article>
 
@@ -147,9 +150,28 @@
                   <select id="product">
                     <option value="">Selecione o produto</option>
                     <option value="adquirencia">Adquirência</option>
-                    <option value="tef-adquirencia">TEF + Adquirência</option>
-                    <option value="voucher-fisico">Voucher e Físico</option>
+                    <option value="adquirencia-voucher">Adquirência / Voucher</option>
+                    <option value="fisico">Físico</option>
                   </select>
+                </label>
+
+                <label>
+                  Filial (UF)
+                  <select id="branchUf">
+                    <option value="">Selecione a UF</option>
+                    <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option>
+                    <option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option>
+                    <option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+                    <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option>
+                    <option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option>
+                    <option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+                    <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+                  </select>
+                </label>
+
+                <label>
+                  Vendedor
+                  <input id="sellerName" type="text" placeholder="Informe o vendedor" />
                 </label>
               </form>
             </div>
@@ -215,14 +237,17 @@
                       <div>0,89%</div><div>1,90%</div><div>2,53%</div><div>2,70%</div>
                     </div>
                     <div class="offer-brands" aria-label="Bandeiras">
-                      <img class="brand-logo" src="assets/bandeira-mastercard.png" alt="Mastercard" />
-                      <img class="brand-logo" src="assets/bandeira-visa.png" alt="Visa" />
-                      <img class="brand-logo" src="assets/bandeira-elo.png" alt="Elo" />
+                      <!-- Substitua aqui a imagem da bandeira Mastercard: src="assets/sua-bandeira-mastercard.png" -->
+                      <img class="brand-logo" src="mastercard - img.png" alt="Mastercard" />
+                      <!-- Substitua aqui a imagem da bandeira Visa: src="assets/sua-bandeira-visa.png" -->
+                      <img class="brand-logo" src="visa - img.png" alt="Visa" />
+                      <!-- Substitua aqui a imagem da bandeira Elo: src="assets/sua-bandeira-elo.png" -->
+                      <img class="brand-logo" src="elo img.png" alt="Elo" />
                     </div>
 
                     <div class="offer-footer-grid">
                       <p><strong>Antecipação:</strong> Automática 1,65%</p>
-                      <div><strong>Terminais:</strong><div class="terminal-sim"><img class="machine-thumb" src="https://drive.google.com/thumbnail?id=1lSzjiMadueKbkTRJVUpWvbX8ck9vkbr1&sz=w320" alt="Terminal SmartPOS Redeflex" onerror="this.onerror=null;this.src='assets/terminal-redeflex.svg';" /><span class="terminal-name">SmartPOS</span><span class="terminal-price">R$ 139,90</span></div></div>
+                      <div><strong>Terminais:</strong><div class="terminal-sim"><img class="machine-thumb" src="https://drive.google.com/thumbnail?id=1lSzjiMadueKbkTRJVUpWvbX8ck9vkbr1&sz=w320_" alt="Terminal SmartPOS Redeflex" onerror="this.onerror=null;this.src='assets/terminal-redeflex.svg';" /><span class="terminal-name">SmartPOS</span><span class="terminal-price">R$ 139,90</span></div></div>
                       <p><strong>PIX:</strong> R$ 0,69</p>
                     </div>
                   </article>
@@ -239,14 +264,17 @@
                       <div>0,89%</div><div>1,90%</div><div>2,53%</div><div>2,70%</div>
                     </div>
                     <div class="offer-brands" aria-label="Bandeiras">
-                      <img class="brand-logo" src="assets/bandeira-mastercard.png" alt="Mastercard" />
-                      <img class="brand-logo" src="assets/bandeira-visa.png" alt="Visa" />
-                      <img class="brand-logo" src="assets/bandeira-elo.png" alt="Elo" />
+                      <!-- Substitua aqui a imagem da bandeira Mastercard: src="assets/sua-bandeira-mastercard.png" -->
+                      <img class="brand-logo" src="mastercard - img.png" alt="Mastercard" />
+                      <!-- Substitua aqui a imagem da bandeira Visa: src="assets/sua-bandeira-visa.png" -->
+                      <img class="brand-logo" src="visa - img.png" alt="Visa" />
+                      <!-- Substitua aqui a imagem da bandeira Elo: src="assets/sua-bandeira-elo.png" -->
+                      <img class="brand-logo" src="elo img.png" alt="Elo" />
                     </div>
 
                     <div class="offer-footer-grid">
                       <p><strong>Antecipação:</strong> Automática 2,99%</p>
-                      <div><strong>Terminais:</strong><div class="terminal-sim"><img class="machine-thumb" src="https://drive.google.com/thumbnail?id=1lSzjiMadueKbkTRJVUpWvbX8ck9vkbr1&sz=w320" alt="Terminal SmartPOS Redeflex" onerror="this.onerror=null;this.src='assets/terminal-redeflex.svg';" /><span class="terminal-name">SmartPOS</span><span class="terminal-price">R$ 139,90</span></div></div>
+                      <div><strong>Terminais:</strong><div class="terminal-sim"><img class="machine-thumb" src="https://drive.google.com/thumbnail?id=1lSzjiMadueKbkTRJVUpWvbX8ck9vkbr1&sz=w320_" alt="Terminal SmartPOS Redeflex" onerror="this.onerror=null;this.src='assets/terminal-redeflex.svg';" /><span class="terminal-name">SmartPOS</span><span class="terminal-price">R$ 139,90</span></div></div>
                       <p><strong>PIX:</strong> R$ 0,69</p>
                     </div>
                   </article>
@@ -256,14 +284,16 @@
               <details class="qual-section" open>
                 <summary>Simular oferta selecionada</summary>
                 <div class="proposal-simulate">
-                  <p class="simulate-hint">Clique em "Simular" para prosseguir</p>
                   <div class="simulate-layout">
                     <div class="simulate-card">
                       <div class="brand-rates">
                         <div class="brand-row brand-head"><span>Bandeira</span><span>Débito</span><span>À vista</span><span>2 a 6x</span><span>7 a 12x</span></div>
-                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="assets/bandeira-mastercard.png" alt="Mastercard" /></span><span>1,58%</span><span>2,51%</span><span>2,98%</span><span>3,24%</span></div>
-                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="assets/bandeira-visa.png" alt="Visa" /></span><span>1,59%</span><span>2,67%</span><span>2,81%</span><span>3,16%</span></div>
-                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="assets/bandeira-elo.png" alt="Elo" /></span><span>2,03%</span><span>3,22%</span><span>2,89%</span><span>3,36%</span></div>
+                        <!-- Simulação: troque a imagem da bandeira Mastercard no src abaixo -->
+                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="mastercard - img.png" alt="Mastercard" /></span><span>1,58%</span><span>2,51%</span><span>2,98%</span><span>3,24%</span></div>
+                        <!-- Simulação: troque a imagem da bandeira Visa no src abaixo -->
+                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="visa - img.png" alt="Visa" /></span><span>1,59%</span><span>2,67%</span><span>2,81%</span><span>3,16%</span></div>
+                        <!-- Simulação: troque a imagem da bandeira Elo no src abaixo -->
+                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="elo img.png" alt="Elo" /></span><span>2,03%</span><span>3,22%</span><span>2,89%</span><span>3,36%</span></div>
                       </div>
                     </div>
                     <div class="simulate-card simulate-card--aside">
@@ -275,15 +305,26 @@
                   </div>
 
                   <div class="simulate-machine">
-                    <div class="simulate-machine__head"><strong>Máquina Stone</strong><strong>Aluguel zero</strong></div>
+                    <div class="simulate-machine__head"><strong>Ponto de Captura</strong></div>
                     <div class="simulate-machine__grid">
-                      <label>Tipo de máquina<input type="text" value="POS" readonly /></label>
-                      <label>Modelo<input type="text" value="SmartPOS" readonly /></label>
-                      <label>Quantidade<input type="text" value="1" readonly /></label>
-                      <label>Mensalidade<input type="text" value="R$ 79,90" readonly /></label>
-                      <label>Isenção<input type="text" value="0" readonly /></label>
-                      <button class="btn btn-primary" type="button">Adicionar</button>
+                      <label>Tipo de máquina
+                        <select id="captureType">
+                          <option value="POS">POS</option>
+                          <option value="TEF">TEF</option>
+                        </select>
+                      </label>
+                      <label>Modelo
+                        <select id="captureModel">
+                          <option value="DX8000">DX8000</option>
+                          <option value="MOVE5000">MOVE5000</option>
+                        </select>
+                      </label>
+                      <label>Quantidade
+                        <input id="captureQty" type="number" min="1" value="1" />
+                      </label>
+                      <button id="addCapturePoint" class="btn btn-primary" type="button">Adicionar</button>
                     </div>
+                    <div id="captureDetails" class="capture-details"><div class="capture-empty">Nenhum ponto de captura adicionado.</div></div>
                   </div>
                 </div>
               </details>
@@ -298,12 +339,16 @@
                   <label>Renda mensal<input type="text" placeholder="Informe a renda" /></label>
                 </div>
                 <h4 class="subsection-title">Endereço</h4>
+                <div class="cep-lookup-row">
+                  <label>CEP<input id="customerCep" type="text" placeholder="Preencha o CEP" maxlength="9" /></label>
+                  <button id="cepLookup" class="btn btn-outline" type="button">Consultar CEP (Correios)</button>
+                  <small id="cepStatus" class="api-status"></small>
+                </div>
                 <div class="proposal-form-grid">
-                  <label>CEP<input type="text" placeholder="Preencha o CEP" /></label>
-                  <label>Estado<input type="text" placeholder="UF" /></label>
-                  <label>Cidade<input type="text" placeholder="Preencha a cidade" /></label>
-                  <label>Bairro<input type="text" placeholder="Preencha o bairro" /></label>
-                  <label>Logradouro<input type="text" placeholder="Preencha o logradouro" /></label>
+                  <label>Estado<input id="customerState" type="text" placeholder="UF" /></label>
+                  <label>Cidade<input id="customerCity" type="text" placeholder="Preencha a cidade" /></label>
+                  <label>Bairro<input id="customerDistrict" type="text" placeholder="Preencha o bairro" /></label>
+                  <label>Logradouro<input id="customerStreet" type="text" placeholder="Preencha o logradouro" /></label>
                   <label>Número<input type="text" placeholder="Preencha o número" /></label>
                   <label>Complemento<input type="text" placeholder="Preencha o complemento" /></label>
                   <label>Referência<input type="text" placeholder="Preencha a referência" /></label>
@@ -333,6 +378,78 @@
                 </div>
               </details>
             </div>
+          </div>
+
+          <div class="panel hidden" id="creditedPanel">
+            <div class="panel-body panel-body--no-title credited-body">
+              <h3 id="creditedHeader">CLIENTE CREDENCIADO</h3>
+
+              <nav class="credited-tabs" aria-label="Seções do credenciamento">
+                <button class="credited-tab active" type="button">🏬 Dados Cadastrais</button>
+                <button class="credited-tab" type="button">🤝 Acordo Comercial</button>
+                <button class="credited-tab" type="button">🧾 Terminais</button>
+                <button class="credited-tab" type="button">🔑 Ativação de Produtos</button>
+              </nav>
+
+              <section class="credited-grid">
+                <article class="credited-card">
+                  <h4>
+                    <span class="credited-icon">🏬</span>
+                    Estabelecimento
+                  </h4>
+                  <p><strong>CNPJ:</strong> <span id="credDoc">-</span></p>
+                  <p><strong>Código redeflex:</strong> <span id="credStoneCode">184246488</span></p>
+                  <p><strong>Filial:</strong> <span id="credBranch">-</span></p>
+                  <p><strong>Vendedor:</strong> <span id="credSeller">-</span></p>
+                  <p><strong>Origem:</strong> intraflex</p>
+                  <p><strong>Ciclo de venda:</strong> Funil de Vendas</p>
+                  <!-- Ícone da seção Estabelecimento: substitua o emoji em .credited-icon por <img src="assets/seu-icone-estabelecimento.png" alt="Estabelecimento"> -->
+                </article>
+
+                <article class="credited-card">
+                  <h4>
+                    <span class="credited-icon">👤</span>
+                    Responsável
+                  </h4>
+                  <p><strong>Nome:</strong> <span id="credOwner">-</span></p>
+                  <p><strong>CPF:</strong> <span id="credCpf">73.*****-04</span></p>
+                  <p><strong>E-mail:</strong> <span id="credEmail">restaurantecontemporaneo2025@gmail.com</span></p>
+                  <p><strong>Celular:</strong> <span id="credPhone">-</span></p>
+                  <!-- Ícone da seção Responsável: substitua o emoji por imagem personalizada do cliente -->
+                </article>
+
+                <article class="credited-card">
+                  <h4>
+                    <span class="credited-icon">📍</span>
+                    Endereço
+                  </h4>
+                  <p><strong>CEP:</strong> <span id="credCep">32242270</span></p>
+                  <p><strong>Cidade:</strong> Belo Horizonte</p>
+                  <p><strong>UF:</strong> MG</p>
+                  <p><strong>Bairro:</strong> Centro</p>
+                  <!-- Ícone da seção Endereço: aqui você pode inserir o ícone/mapa desejado -->
+                </article>
+
+                <article class="credited-card">
+                  <h4>
+                    <span class="credited-icon">🏦</span>
+                    Conta
+                  </h4>
+                  <p><strong>Banco:</strong> **********</p>
+                  <p><strong>Agência:</strong> ****</p>
+                  <p><strong>Conta:</strong> ******-*</p>
+                  <p><strong>Status:</strong> Liberado para instalação</p>
+                  <!-- Ícone da seção Conta/Banco: substitua o emoji por imagem de banco quando desejar -->
+                </article>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <div id="loadingOverlay" class="loading-overlay hidden" aria-live="polite">
+          <div class="loading-box">
+            <div class="loading-spinner"></div>
+            <p>Credenciando cliente... aguarde 5 segundos.</p>
           </div>
         </div>
 
@@ -373,6 +490,7 @@
       const confirmPanel = document.getElementById('confirmPanel');
       const qualificationPanel = document.getElementById('qualificationPanel');
       const proposalPanel = document.getElementById('proposalPanel');
+      const creditedPanel = document.getElementById('creditedPanel');
       const backToCompany = document.getElementById('backToCompany');
       const stepper = document.getElementById('stepper');
 
@@ -383,6 +501,8 @@
       const leadCount = document.getElementById('leadCount');
       const leadList = document.getElementById('leadList');
       const leadEmptyState = document.getElementById('leadEmptyState');
+      const creditedCards = document.getElementById('creditedCards');
+      const creditedCount = document.getElementById('creditedCount');
 
       const doc = document.getElementById('doc');
       const fantasy = document.getElementById('fantasy');
@@ -399,6 +519,8 @@
       const fullName = document.getElementById('fullName');
       const phone = document.getElementById('phone');
       const product = document.getElementById('product');
+      const branchUf = document.getElementById('branchUf');
+      const sellerName = document.getElementById('sellerName');
 
       const qualDoc = document.getElementById('qualDoc');
       const qualFantasy = document.getElementById('qualFantasy');
@@ -410,6 +532,12 @@
       const proposalPhone = document.getElementById('proposalPhone');
       const proposalRevenue = document.getElementById('proposalRevenue');
       const proposalProduct = document.getElementById('proposalProduct');
+      const credDoc = document.getElementById('credDoc');
+      const credOwner = document.getElementById('credOwner');
+      const credPhone = document.getElementById('credPhone');
+      const credBranch = document.getElementById('credBranch');
+      const credSeller = document.getElementById('credSeller');
+      const creditedHeader = document.getElementById('creditedHeader');
       const pdvRevenue = document.getElementById('pdvRevenue');
       const saveQualification = document.getElementById('saveQualification');
       const loseOpportunity = document.getElementById('loseOpportunity');
@@ -417,8 +545,22 @@
       const loseOpportunityProposal = document.getElementById('loseOpportunityProposal');
       const saveProposalData = document.getElementById('saveProposalData');
       const approveProposal = document.getElementById('approveProposal');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const customerCep = document.getElementById('customerCep');
+      const customerState = document.getElementById('customerState');
+      const customerCity = document.getElementById('customerCity');
+      const customerDistrict = document.getElementById('customerDistrict');
+      const customerStreet = document.getElementById('customerStreet');
+      const cepLookup = document.getElementById('cepLookup');
+      const cepStatus = document.getElementById('cepStatus');
+      const captureType = document.getElementById('captureType');
+      const captureModel = document.getElementById('captureModel');
+      const captureQty = document.getElementById('captureQty');
+      const addCapturePoint = document.getElementById('addCapturePoint');
+      const captureDetails = document.getElementById('captureDetails');
 
       let leadNumber = 0;
+      let creditedModelRegistered = false;
 
       const setActiveStep = (step) => {
         stepper.querySelectorAll('li').forEach((item) => item.classList.remove('active'));
@@ -426,12 +568,56 @@
         if (target) target.classList.add('active');
       };
 
+      const formatCep = (value) => {
+        const digits = value.replace(/\D/g, '').slice(0, 8);
+        if (digits.length <= 5) return digits;
+        return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+      };
+
+      const getFilialByDdd = (phoneValue) => {
+        const ddd = phoneValue.replace(/\D/g, '').slice(0, 2);
+        const ufByDdd = {
+          '11': 'SP',
+          '21': 'RJ',
+          '31': 'MG',
+          '41': 'PR',
+          '51': 'RS',
+          '61': 'DF',
+          '71': 'BA'
+        };
+        return ufByDdd[ddd] || '--';
+      };
+
+      const registerCreditedModelCard = () => {
+        if (creditedModelRegistered) return;
+
+        const card = document.createElement('div');
+        card.className = 'deal-card success credited-model-card open-credited-card';
+        card.innerHTML = `
+          <h3>${(fantasy.value || legalName.value || "Nome Fantasia").toUpperCase()}</h3>
+          <p><b>Filial:</b> ${branchUf.value || getFilialByDdd(phone.value)}</p>
+          <p><b>Tipo:</b> Adquirente</p>
+          <p><b>Vendedor:</b> ${sellerName.value || ""}</p>
+          <p><b>Documento:</b> ${doc.value || ""}</p>
+          <div class="credited-model-status">Liberado para instalação</div>
+          <div class="credited-model-date">📅 Data de lançamento/liberação: ${new Date().toLocaleDateString('pt-BR')}</div>
+        `;
+
+        creditedCards.prepend(card);
+        creditedModelRegistered = true;
+
+        const current = Number(creditedCount.textContent || '0');
+        creditedCount.textContent = String(current + 1);
+      };
+
       const showCompanyStep = () => {
+        drawerTitle.classList.remove('hidden');
         drawerTitle.textContent = 'Cliente Novo';
         companyPanel.classList.remove('hidden');
         confirmPanel.classList.add('hidden');
         qualificationPanel.classList.add('hidden');
         proposalPanel.classList.add('hidden');
+        creditedPanel.classList.add('hidden');
         backToCompany.classList.add('hidden');
         saveLeadData.classList.add('hidden');
         sendToQualification.classList.add('hidden');
@@ -449,6 +635,7 @@
         confirmPanel.classList.remove('hidden');
         qualificationPanel.classList.add('hidden');
         proposalPanel.classList.add('hidden');
+        creditedPanel.classList.add('hidden');
         backToCompany.classList.remove('hidden');
         saveLeadData.classList.remove('hidden');
         sendToQualification.classList.remove('hidden');
@@ -459,11 +646,13 @@
       };
 
       const showQualificationStep = () => {
+        drawerTitle.classList.remove('hidden');
         drawerTitle.textContent = `${fullName.value.trim() || 'Cliente'} - ${doc.value || '-'}`;
         companyPanel.classList.add('hidden');
         confirmPanel.classList.add('hidden');
         qualificationPanel.classList.remove('hidden');
         proposalPanel.classList.add('hidden');
+        creditedPanel.classList.add('hidden');
         confirmActions.classList.add('hidden');
         qualificationActions.classList.remove('hidden');
         proposalActions.classList.add('hidden');
@@ -477,11 +666,13 @@
 
 
       const showProposalStep = () => {
+        drawerTitle.classList.remove('hidden');
         drawerTitle.textContent = `${fullName.value.trim() || 'Cliente'} - ${doc.value || '-'}`;
         companyPanel.classList.add('hidden');
         confirmPanel.classList.add('hidden');
         qualificationPanel.classList.add('hidden');
         proposalPanel.classList.remove('hidden');
+        creditedPanel.classList.add('hidden');
         confirmActions.classList.add('hidden');
         qualificationActions.classList.add('hidden');
         proposalActions.classList.remove('hidden');
@@ -495,20 +686,45 @@
 
         const productMap = {
           adquirencia: 'Adquirência',
-          'tef-adquirencia': 'TEF + Adquirência',
-          'voucher-fisico': 'Voucher e Físico',
+          'adquirencia-voucher': 'Adquirência / Voucher',
+          fisico: 'Físico',
         };
         proposalProduct.textContent = productMap[product.value] || '-';
       };
+
+      const showCreditedStep = () => {
+        drawerTitle.classList.add('hidden');
+        companyPanel.classList.add('hidden');
+        confirmPanel.classList.add('hidden');
+        qualificationPanel.classList.add('hidden');
+        proposalPanel.classList.add('hidden');
+        creditedPanel.classList.remove('hidden');
+
+        confirmActions.classList.add('hidden');
+        qualificationActions.classList.add('hidden');
+        proposalActions.classList.add('hidden');
+
+        setActiveStep('4');
+
+        const displayName = fantasy.value || legalName.value || 'CLIENTE CREDENCIADO';
+        creditedHeader.textContent = `${displayName.toUpperCase()} - ${doc.value || '-'}`;
+        credDoc.textContent = doc.value || '-';
+        credOwner.textContent = fullName.value || '-';
+        credPhone.textContent = phone.value || '-';
+        credBranch.textContent = branchUf.value || getFilialByDdd(phone.value);
+        credSeller.textContent = sellerName.value || "-";
+      };
+
       const openDrawer = () => {
         drawer.classList.add('open');
         drawer.setAttribute('aria-hidden', 'false');
         showCompanyStep();
       };
 
-      const closeDrawerFn = () => {
+      const closeDrawerFn = (registerCard = false) => {
         drawer.classList.remove('open');
         drawer.setAttribute('aria-hidden', 'true');
+        if (registerCard) registerCreditedModelCard();
       };
 
       const formatCpf = (digits) =>
@@ -564,8 +780,8 @@
       };
 
       const validateConfirmStep = () => {
-        if (!fullName.value.trim() || phone.value.replace(/\D/g, '').length < 10 || !product.value) {
-          saveStatus.textContent = 'Preencha nome completo, telefone e produto para continuar.';
+        if (!fullName.value.trim() || phone.value.replace(/\D/g, '').length < 10 || !product.value || !branchUf.value || !sellerName.value.trim()) {
+          saveStatus.textContent = 'Preencha nome completo, telefone, produto, filial (UF) e vendedor para continuar.';
           return false;
         }
         return true;
@@ -590,7 +806,7 @@
       };
 
       openLeadButton.addEventListener('click', openDrawer);
-      minimizeLead.addEventListener('click', closeDrawerFn);
+      minimizeLead.addEventListener('click', () => closeDrawerFn(true));
       closeLead.addEventListener('click', closeDrawerFn);
       backToCompany.addEventListener('click', showCompanyStep);
       saveLeadData.addEventListener('click', saveLeadCard);
@@ -602,6 +818,13 @@
         }
       });
 
+      creditedCards.addEventListener('click', (event) => {
+        const card = event.target.closest('.open-credited-card');
+        if (!card) return;
+        openDrawer();
+        showCreditedStep();
+      });
+
       doc.addEventListener('input', () => {
         doc.value = formatDocumento(doc.value);
         apiStatus.textContent = '';
@@ -610,6 +833,8 @@
 
       phone.addEventListener('input', () => {
         phone.value = formatPhone(phone.value);
+        const suggestedUf = getFilialByDdd(phone.value);
+        if (suggestedUf !== '--') branchUf.value = suggestedUf;
       });
 
       pdvRevenue.addEventListener('input', () => {
@@ -646,6 +871,74 @@
           apiStatus.textContent = error.message;
         }
       });
+
+
+      customerCep.addEventListener('input', () => {
+        customerCep.value = formatCep(customerCep.value);
+      });
+
+      cepLookup.addEventListener('click', async () => {
+        const cepDigits = customerCep.value.replace(/\D/g, '');
+
+        if (cepDigits.length !== 8) {
+          cepStatus.textContent = 'Informe um CEP válido com 8 dígitos para consultar.';
+          return;
+        }
+
+        cepStatus.textContent = 'Consultando CEP (Correios/ViaCEP)...';
+
+        try {
+          const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`);
+          if (!response.ok) throw new Error('Falha ao consultar CEP.');
+
+          const data = await response.json();
+          if (data.erro) throw new Error('CEP não encontrado.');
+
+          customerState.value = data.uf || '';
+          customerCity.value = data.localidade || '';
+          customerDistrict.value = data.bairro || '';
+          customerStreet.value = data.logradouro || '';
+          cepStatus.textContent = 'Consulta de CEP concluída com sucesso.';
+        } catch (error) {
+          cepStatus.textContent = error.message;
+        }
+      });
+
+
+      const captureModelsByType = {
+        POS: ['DX8000', 'MOVE5000'],
+        TEF: ['LANE3000']
+      };
+
+      const refreshCaptureModels = () => {
+        const selectedType = captureType.value;
+        const models = captureModelsByType[selectedType] || [];
+        captureModel.innerHTML = models.map((m) => `<option value="${m}">${m}</option>`).join('');
+      };
+
+      captureType.addEventListener('change', refreshCaptureModels);
+
+      addCapturePoint.addEventListener('click', () => {
+        const type = captureType.value;
+        const model = captureModel.value;
+        const qty = Math.max(1, Number(captureQty.value || 1));
+
+        const empty = captureDetails.querySelector('.capture-empty');
+        if (empty) empty.remove();
+
+        const detail = document.createElement('div');
+        detail.className = 'capture-detail-item';
+        detail.innerHTML = `
+          <div class="capture-detail-top">
+            <strong>${type}</strong>
+            <span class="capture-badge">${qty} un.</span>
+          </div>
+          <div class="capture-detail-meta">Modelo selecionado: <b>${model}</b></div>
+        `;
+        captureDetails.prepend(detail);
+      });
+
+      refreshCaptureModels();
 
       createClient.addEventListener('click', () => {
         const digits = getDocDigits();
@@ -697,8 +990,15 @@
       });
 
       approveProposal.addEventListener('click', () => {
-        setActiveStep('4');
-        saveStatus.textContent = 'Cliente credenciado com sucesso (protótipo).';
+        loadingOverlay.classList.remove('hidden');
+        approveProposal.disabled = true;
+
+        setTimeout(() => {
+          loadingOverlay.classList.add('hidden');
+          approveProposal.disabled = false;
+          showCreditedStep();
+          saveStatus.textContent = 'Cliente credenciado com sucesso (protótipo).';
+        }, 5000);
       });
 
     </script>
