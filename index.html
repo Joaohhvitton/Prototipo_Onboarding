@@ -398,6 +398,29 @@
               </details>
 
               <details class="qual-section" open>
+                <summary>Domicílio bancário</summary>
+                <p class="info-banner">Digite nome ou código do banco para buscar automaticamente via API e selecione o tipo de conta.</p>
+                <div class="proposal-form-grid proposal-form-grid--bank">
+                  <label>Banco
+                    <input id="bankSearch" type="text" list="bankSuggestions" placeholder="Ex.: 341 ou Itaú" autocomplete="off" />
+                    <datalist id="bankSuggestions"></datalist>
+                    <small id="bankStatus" class="api-status"></small>
+                  </label>
+                  <label>Tipo da conta
+                    <select id="bankAccountType">
+                      <option value="conta-corrente">Conta Corrente</option>
+                      <option value="poupanca">Poupança</option>
+                    </select>
+                  </label>
+                  <label>Agência<input id="bankBranch" type="text" placeholder="1435" /></label>
+                  <label>Dígito da agência<input id="bankBranchDigit" type="text" placeholder="0" /></label>
+                  <label>Operação<input id="bankOperation" type="text" placeholder="003" /></label>
+                  <label>Número da conta<input id="bankAccountNumber" type="text" placeholder="578246314" /></label>
+                  <label>Dígito da conta<input id="bankAccountDigit" type="text" placeholder="3" /></label>
+                </div>
+              </details>
+
+              <details class="qual-section" open>
                 <summary>Recebimento de Vendas</summary>
                 <p class="info-banner">Os dados preenchidos devem corresponder aos do documento do responsável e verificação de identidade na abertura da Conta Stone.</p>
                 <div class="proposal-form-grid">
@@ -478,7 +501,7 @@
         <div id="loadingOverlay" class="loading-overlay hidden" aria-live="polite">
           <div class="loading-box">
             <div class="loading-spinner"></div>
-            <p>Credenciando cliente... aguarde 5 segundos.</p>
+            <p id="loadingMessage">Credenciando cliente... aguarde 5 segundos.</p>
           </div>
         </div>
 
@@ -583,11 +606,21 @@
       const saveProposalData = document.getElementById('saveProposalData');
       const approveProposal = document.getElementById('approveProposal');
       const loadingOverlay = document.getElementById('loadingOverlay');
+      const loadingMessage = document.getElementById('loadingMessage');
       const customerCep = document.getElementById('customerCep');
       const customerState = document.getElementById('customerState');
       const customerCity = document.getElementById('customerCity');
       const customerDistrict = document.getElementById('customerDistrict');
       const customerStreet = document.getElementById('customerStreet');
+      const bankSearch = document.getElementById('bankSearch');
+      const bankSuggestions = document.getElementById('bankSuggestions');
+      const bankStatus = document.getElementById('bankStatus');
+      const bankAccountType = document.getElementById('bankAccountType');
+      const bankBranch = document.getElementById('bankBranch');
+      const bankBranchDigit = document.getElementById('bankBranchDigit');
+      const bankOperation = document.getElementById('bankOperation');
+      const bankAccountNumber = document.getElementById('bankAccountNumber');
+      const bankAccountDigit = document.getElementById('bankAccountDigit');
       const cepLookup = document.getElementById('cepLookup');
       const cepStatus = document.getElementById('cepStatus');
       const captureType = document.getElementById('captureType');
@@ -598,6 +631,7 @@
 
       let currentStep = '1';
       let activeProposalDoc = '';
+      let banksCache = [];
 
       const setActiveStep = (step) => {
         currentStep = step;
@@ -771,6 +805,14 @@
         customerCity.value = '';
         customerDistrict.value = '';
         customerStreet.value = '';
+        bankSearch.value = '';
+        bankStatus.textContent = '';
+        bankAccountType.value = 'conta-corrente';
+        bankBranch.value = '';
+        bankBranchDigit.value = '';
+        bankOperation.value = '';
+        bankAccountNumber.value = '';
+        bankAccountDigit.value = '';
         pdvRevenue.value = '';
         apiStatus.textContent = '';
         cepStatus.textContent = '';
@@ -1095,6 +1137,77 @@
       });
 
 
+      bankSearch.addEventListener('focus', async () => {
+        await loadBanks();
+        renderBankSuggestions(bankSearch.value);
+      });
+
+      bankSearch.addEventListener('input', async () => {
+        await loadBanks();
+        renderBankSuggestions(bankSearch.value);
+      });
+
+      bankSearch.addEventListener('change', () => {
+        if (!bankSearch.value.trim()) {
+          bankStatus.textContent = '';
+          return;
+        }
+        renderBankSuggestions(bankSearch.value);
+      });
+
+      const normalizeText = (value = '') =>
+        value
+          .toString()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
+
+      const loadBanks = async () => {
+        if (banksCache.length) return banksCache;
+        bankStatus.textContent = 'Consultando bancos...';
+
+        try {
+          const response = await fetch('https://brasilapi.com.br/api/banks/v1');
+          if (!response.ok) throw new Error('Falha ao consultar bancos.');
+          const data = await response.json();
+          banksCache = Array.isArray(data) ? data : [];
+          bankStatus.textContent = 'Bancos carregados. Digite para filtrar.';
+        } catch (error) {
+          bankStatus.textContent = error.message;
+        }
+
+        return banksCache;
+      };
+
+      const renderBankSuggestions = (query = '') => {
+        const normalizedQuery = normalizeText(query.trim());
+        if (!normalizedQuery || !banksCache.length) {
+          bankSuggestions.innerHTML = '';
+          return;
+        }
+
+        const results = banksCache
+          .filter((bank) => {
+            const code = String(bank.code || '').trim();
+            const name = normalizeText(bank.name || '');
+            const fullName = normalizeText(bank.fullName || '');
+            return code.includes(normalizedQuery) || name.includes(normalizedQuery) || fullName.includes(normalizedQuery);
+          })
+          .slice(0, 20);
+
+        bankSuggestions.innerHTML = results
+          .map((bank) => {
+            const code = bank.code || '--';
+            const name = bank.name || bank.fullName || 'Banco sem nome';
+            return `<option value="${code} - ${name}"></option>`;
+          })
+          .join('');
+
+        bankStatus.textContent = results.length
+          ? `${results.length} banco(s) encontrado(s).`
+          : 'Nenhum banco encontrado para o filtro informado.';
+      };
+
       const captureModelsByType = {
         POS: ['DX8000', 'MOVE5000'],
         TEF: ['LANE3000']
@@ -1175,11 +1288,21 @@
           saveStatus.textContent = 'Preencha o faturamento bruto do PDV antes de gerar proposta.';
           return;
         }
+
         const docKey = getCurrentDocKey();
         removeQualificationCardByDoc(docKey);
-        saveStatus.textContent = 'Etapa de Proposta aberta com ofertas pré-aprovadas.';
-        showProposalStep();
-        upsertProposalCard();
+
+        loadingMessage.textContent = 'Gerando oferta da qualificação... aguarde 5 segundos.';
+        loadingOverlay.classList.remove('hidden');
+        generateProposal.disabled = true;
+
+        setTimeout(() => {
+          loadingOverlay.classList.add('hidden');
+          generateProposal.disabled = false;
+          saveStatus.textContent = 'Etapa de Proposta aberta com ofertas pré-aprovadas.';
+          showProposalStep();
+          upsertProposalCard();
+        }, 5000);
       });
 
       saveProposalData.addEventListener('click', () => {
@@ -1197,6 +1320,7 @@
       });
 
       approveProposal.addEventListener('click', () => {
+        loadingMessage.textContent = 'Credenciando cliente... aguarde 5 segundos.';
         loadingOverlay.classList.remove('hidden');
         approveProposal.disabled = true;
 
