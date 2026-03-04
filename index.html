@@ -1,1041 +1,1018 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Protótipo Onboarding | Funil + Lead</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="layout">
-      <aside class="sidebar">
-        <div class="brand">▦</div>
-        <nav>
-          <button class="nav-btn">⌂</button>
-          <button class="nav-btn active">▣</button>
-          <button class="nav-btn">◫</button>
-          <button class="nav-btn">⚙</button>
-        </nav>
-      </aside>
-
-      <main class="main">
-        <header class="main-header">
-          <h1>Funil de Vendas</h1>
-          <div class="header-actions">
-            <button class="btn btn-muted">Enviar Relatório</button>
-            <button id="openLeadButton" class="btn btn-primary">Criar Cliente Novo</button>
-          </div>
-        </header>
-
-        <section class="filters">
-          <input type="text" placeholder="Buscar por CNPJ" />
-          <input type="text" placeholder="__/__/____" />
-          <button class="btn btn-primary">Buscar</button>
-        </section>
-
-        <section class="kanban">
-          <article class="column" id="leadColumn">
-            <header><h2>Lead Novo</h2><span id="leadCount">0</span></header>
-            <p class="empty-state" id="leadEmptyState">Nenhum lead no momento.</p>
-            <div id="leadList" class="lead-list"></div>
-          </article>
-
-          <article class="column"><header><h2>Qualificação</h2><span>0</span></header></article>
-
-          <article class="column column-proposta">
-            <header><h2>Proposta</h2><span>1</span></header>
-            <div class="deal-card">
-              <h3>MERCADINHO RAMOS</h3>
-              <p><b>Filial:</b> Flex Pagamentos</p>
-              <p><b>Documento:</b> 37.163.989/0001-64</p>
-              <p><b>Vendedor:</b> João Vitor Oliveira de Lima</p>
-              <p><b>Cliente:</b> ANDRO DE OLIVEIRA RAMOS</p>
-              <p><b>Contato:</b> (77) 98854-1288</p>
-            </div>
-          </article>
-
-          <article class="column column-credenciado">
-            <header><h2>Credenciado</h2><span id="creditedCount">1</span></header>
-            <div id="creditedCards">
-              <div class="deal-card success open-credited-card">
-                <h3>ESQUINA VELOSO</h3>
-                <p><b>Filial:</b> Flex Pagamentos</p>
-                <p><b>Tipo:</b> Adquirente</p>
-                <p><b>Vendedor:</b> João Vitor Oliveira de Lima</p>
-                <p><b>Documento:</b> 21.653.392/0001-68</p>
-                <div class="credited-model-status">Liberado para instalação</div>
-                <div class="credited-model-date">📅 Data de lançamento/liberação: 04/03/2026</div>
-              </div>
-            </div>
-          </article>
-
-          <article class="column column-lost"><header><h2>Perdido</h2><span>0</span></header></article>
-        </section>
-      </main>
-
-      <section id="leadDrawer" class="lead-drawer" aria-hidden="true">
-        <header class="drawer-top">
-          <button id="minimizeLead" class="icon-btn" aria-label="Minimizar">—</button>
-          <ol class="stepper" id="stepper">
-            <li class="active" data-step="1"><span>1</span>Lead Novo</li>
-            <li data-step="2"><span>2</span>Qualificação</li>
-            <li data-step="3"><span>3</span>Proposta</li>
-            <li data-step="4"><span>4</span>Credenciado</li>
-            <li data-step="lost"><span>✕</span>Perdido</li>
-          </ol>
-          <button id="closeLead" class="icon-btn" aria-label="Fechar">✕</button>
-        </header>
-
-        <div class="drawer-content">
-          <h2 id="drawerTitle">Cliente Novo</h2>
-
-          <div class="panel" id="companyPanel">
-            <div class="panel-title">Dados iniciais da empresa <span>⌄</span></div>
-            <div class="panel-body">
-              <h3>Informações do estabelecimento</h3>
-              <form class="lead-form" id="leadForm">
-                <label>
-                  Documento (CPF ou CNPJ)
-                  <div class="doc-grid">
-                    <div class="input-wrap">
-                      <input id="doc" type="text" maxlength="18" placeholder="CPF ou CNPJ" />
-                      <small class="ok">✓</small>
-                    </div>
-                    <button id="cnpjLookup" class="btn btn-outline" type="button">Consultar CNPJ</button>
-                  </div>
-                  <small id="apiStatus" class="api-status"></small>
-                </label>
-
-                <label>
-                  Nome fantasia
-                  <input id="fantasy" type="text" placeholder="Informe o nome fantasia" />
-                </label>
-
-                <label>
-                  Razão social
-                  <input id="legalName" type="text" placeholder="Informe a razão social" />
-                </label>
-
-                <label>
-                  Ramo de atividade
-                  <input id="industry" type="text" placeholder="Informe o ramo de atividade" />
-                </label>
-              </form>
-            </div>
-          </div>
-
-          <div class="panel hidden" id="confirmPanel">
-            <div class="panel-title">Confirmação final antes da Qualificação <span>⌄</span></div>
-            <div class="panel-body">
-              <h3>Dados do responsável e produto</h3>
-              <form class="lead-form confirm-form" id="confirmForm">
-                <label>
-                  Nome completo
-                  <input id="fullName" type="text" placeholder="Informe o nome completo" />
-                </label>
-
-                <label>
-                  Telefone
-                  <input id="phone" type="text" maxlength="15" placeholder="(00) 00000-0000" />
-                </label>
-
-                <label>
-                  Produto
-                  <select id="product">
-                    <option value="">Selecione o produto</option>
-                    <option value="adquirencia">Adquirência</option>
-                    <option value="adquirencia-voucher">Adquirência / Voucher</option>
-                    <option value="fisico">Físico</option>
-                  </select>
-                </label>
-
-                <label>
-                  Filial (UF)
-                  <select id="branchUf">
-                    <option value="">Selecione a UF</option>
-                    <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option>
-                    <option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option>
-                    <option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
-                    <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option>
-                    <option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option>
-                    <option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
-                    <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
-                  </select>
-                </label>
-
-                <label>
-                  Vendedor
-                  <input id="sellerName" type="text" placeholder="Informe o vendedor" />
-                </label>
-              </form>
-            </div>
-          </div>
-
-          <div class="panel hidden" id="qualificationPanel">
-            <div class="panel-body panel-body--no-title">
-              <details class="qual-section">
-                <summary>Dados iniciais da empresa</summary>
-                <div class="qual-grid">
-                  <p><strong>Documento:</strong> <span id="qualDoc">-</span></p>
-                  <p><strong>Nome fantasia:</strong> <span id="qualFantasy">-</span></p>
-                  <p><strong>Responsável:</strong> <span id="qualOwner">-</span></p>
-                  <p><strong>Contato:</strong> <span id="qualPhone">-</span></p>
-                </div>
-              </details>
-
-              <details class="qual-section">
-                <summary>Dados para qualificar</summary>
-                <label class="qual-field">
-                  Faturamento bruto do PDV
-                  <div class="money-input">
-                    <span>R$</span>
-                    <input id="pdvRevenue" type="text" inputmode="numeric" placeholder="0,00" />
-                  </div>
-                </label>
-              </details>
-            </div>
-          </div>
-          <div class="panel hidden" id="proposalPanel">
-            <div class="panel-body panel-body--no-title">
-              <details class="qual-section">
-                <summary>Dados iniciais da empresa</summary>
-                <div class="qual-grid">
-                  <p><strong>Documento:</strong> <span id="proposalDoc">-</span></p>
-                  <p><strong>Nome fantasia:</strong> <span id="proposalFantasy">-</span></p>
-                  <p><strong>Responsável:</strong> <span id="proposalOwner">-</span></p>
-                  <p><strong>Contato:</strong> <span id="proposalPhone">-</span></p>
-                </div>
-              </details>
-
-              <details class="qual-section">
-                <summary>Dados para qualificar</summary>
-                <div class="qual-grid">
-                  <p><strong>Faturamento bruto do PDV:</strong> <span id="proposalRevenue">-</span></p>
-                  <p><strong>Produto:</strong> <span id="proposalProduct">-</span></p>
-                </div>
-              </details>
-
-              <details class="qual-section" open>
-                <summary>Ofertas</summary>
-                <div class="offers-grid offers-grid--proposal">
-                  <article class="offer-card offer-card--model">
-                    <div class="offer-badge">Mais Vendido</div>
-                    <div class="offer-header">
-                      <h4><strong>Antecipação Automática</strong></h4>
-                      <!-- Substitua aqui pelo logo da oferta: src="assets/seu-logo-redeflex.png" -->
-                      <img class="offer-logo" src="Logo_png-removebg-preview.png" alt="Logo da oferta" />
-                    </div>
-
-                    <ul class="offer-feature-list">
-                      <li><span class="feature-icon feature-icon--ok">✓</span>Antecipação Automática</li>
-                      <li><span class="feature-icon feature-icon--ok">✓</span>Isenção por Volume</li>
-                    </ul>
-
-                    <div class="offer-rates" aria-label="Taxas por bandeira">
-                      <div class="offer-rates__head"><span></span><span>DÉBITO</span><span>À VISTA</span><span>2 A 6X</span><span>7 A 12X</span></div>
-                      <div class="offer-rates__row">
-                        <span class="offer-brand"><img class="brand-logo" src="visa - img.png" alt="Visa" /></span><span>0,89%</span><span>1,90%</span><span>2,53%</span><span>2,70%</span>
-                      </div>
-                      <div class="offer-rates__row">
-                        <span class="offer-brand"><img class="brand-logo" src="mastercard - img.png" alt="Mastercard" /></span><span>0,89%</span><span>1,90%</span><span>2,53%</span><span>2,70%</span>
-                      </div>
-                      <div class="offer-rates__row">
-                        <span class="offer-brand"><img class="brand-logo" src="elo img.png" alt="Elo" /></span><span>1,80%</span><span>2,76%</span><span>3,00%</span><span>3,50%</span>
-                      </div>
-                    </div>
-
-                    <div class="offer-info-grid">
-                      <section class="offer-panel">
-                        <h5>Antecipação</h5>
-                        <p><span>Automática</span><strong>1,65%</strong></p>
-                        <p><span>Eventual</span><strong>3,50%</strong></p>
-                        <p class="offer-highlight"><span class="feature-icon feature-icon--ok">✓</span>Recebimento em 1 dia útil</p>
-                      </section>
-                      <section class="offer-panel">
-                        <h5>Terminais</h5>
-                        <div class="terminal-sim"><img class="machine-thumb" src="https://drive.google.com/thumbnail?id=1lSzjiMadueKbkTRJVUpWvbX8ck9vkbr1&sz=w320" alt="Terminal SmartPOS Redeflex" onerror="this.onerror=null;this.src='assets/terminal-redeflex.svg';" /><span class="terminal-name">SmartPOS</span><span class="terminal-price">R$ 139,90</span></div>
-                        <p class="offer-highlight">★ Isenção por Volume</p>
-                      </section>
-                    </div>
-
-                    <section class="offer-panel offer-panel--pix">
-                      <h5>Pix</h5>
-                      <p><span>PIX</span><strong>R$ 0,69</strong></p>
-                    </section>
-                  </article>
-
-                  <article class="offer-card offer-card--model">
-                    <div class="offer-header">
-                      <h4><strong>Sem</strong> Antecipação Automática</h4>
-                      <!-- Substitua aqui pelo logo da oferta: src="assets/seu-logo-redeflex.png" -->
-                      <img class="offer-logo" src="Logo_png-removebg-preview.png" alt="Logo da oferta" />
-                    </div>
-
-                    <ul class="offer-feature-list">
-                      <li><span class="feature-icon feature-icon--off">✕</span>Antecipação Automática</li>
-                      <li><span class="feature-icon feature-icon--ok">✓</span>Isenção por Volume</li>
-                    </ul>
-
-                    <div class="offer-rates" aria-label="Taxas por bandeira">
-                      <div class="offer-rates__head"><span></span><span>DÉBITO</span><span>À VISTA</span><span>2 A 6X</span><span>7 A 12X</span></div>
-                      <div class="offer-rates__row">
-                        <span class="offer-brand"><img class="brand-logo" src="visa - img.png" alt="Visa" /></span><span>0,89%</span><span>1,90%</span><span>2,53%</span><span>2,70%</span>
-                      </div>
-                      <div class="offer-rates__row">
-                        <span class="offer-brand"><img class="brand-logo" src="mastercard - img.png" alt="Mastercard" /></span><span>0,89%</span><span>1,90%</span><span>2,53%</span><span>2,70%</span>
-                      </div>
-                      <div class="offer-rates__row">
-                        <span class="offer-brand"><img class="brand-logo" src="elo img.png" alt="Elo" /></span><span>1,80%</span><span>2,76%</span><span>3,00%</span><span>3,50%</span>
-                      </div>
-                    </div>
-
-                    <div class="offer-info-grid">
-                      <section class="offer-panel">
-                        <h5>Antecipação</h5>
-                        <p><span>Automática</span><strong>2,99%</strong></p>
-                        <p><span>Eventual</span><strong>3,50%</strong></p>
-                      </section>
-                      <section class="offer-panel">
-                        <h5>Terminais</h5>
-                        <div class="terminal-sim"><img class="machine-thumb" src="https://drive.google.com/thumbnail?id=1lSzjiMadueKbkTRJVUpWvbX8ck9vkbr1&sz=w320" alt="Terminal SmartPOS Redeflex" onerror="this.onerror=null;this.src='assets/terminal-redeflex.svg';" /><span class="terminal-name">SmartPOS</span><span class="terminal-price">R$ 139,90</span></div>
-                        <p class="offer-highlight">★ Isenção por Volume</p>
-                      </section>
-                    </div>
-
-                    <section class="offer-panel offer-panel--pix">
-                      <h5>Pix</h5>
-                      <p><span>PIX</span><strong>R$ 0,69</strong></p>
-                    </section>
-                  </article>
-                </div>
-              </details>
-
-              <details class="qual-section" open>
-                <summary>Simular oferta selecionada</summary>
-                <div class="proposal-simulate">
-                  <div class="simulate-layout">
-                    <div class="simulate-card">
-                      <div class="brand-rates">
-                        <div class="brand-row brand-head"><span>Bandeira</span><span>Débito</span><span>À vista</span><span>2 a 6x</span><span>7 a 12x</span></div>
-                        <!-- Simulação: troque a imagem da bandeira Mastercard no src abaixo -->
-                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="mastercard - img.png" alt="Mastercard" /></span><span>1,58%</span><span>2,51%</span><span>2,98%</span><span>3,24%</span></div>
-                        <!-- Simulação: troque a imagem da bandeira Visa no src abaixo -->
-                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="visa - img.png" alt="Visa" /></span><span>1,59%</span><span>2,67%</span><span>2,81%</span><span>3,16%</span></div>
-                        <!-- Simulação: troque a imagem da bandeira Elo no src abaixo -->
-                        <div class="brand-row"><span class="brand-cell"><img class="brand-logo" src="elo img.png" alt="Elo" /></span><span>2,03%</span><span>3,22%</span><span>2,89%</span><span>3,36%</span></div>
-                      </div>
-                    </div>
-                    <div class="simulate-card simulate-card--aside">
-                      <div class="simulate-kv"><strong>Antecipação</strong><span>Automática 2,03%</span></div>
-                      <div class="simulate-kv"><strong>Eventual</strong><span>2,63%</span></div>
-                      <div class="simulate-kv"><strong>PIX</strong><span>0,75%</span></div>
-                      <div class="simulate-kv"><strong>Taxa fixa</strong><span>0,75</span></div>
-                    </div>
-                  </div>
-
-                  <div class="simulate-machine">
-                    <div class="simulate-machine__head"><strong>Ponto de Captura</strong></div>
-                    <div class="simulate-machine__grid">
-                      <label>Tipo de máquina
-                        <select id="captureType">
-                          <option value="POS">POS</option>
-                          <option value="TEF">TEF</option>
-                        </select>
-                      </label>
-                      <label>Modelo
-                        <select id="captureModel">
-                          <option value="DX8000">DX8000</option>
-                          <option value="MOVE5000">MOVE5000</option>
-                        </select>
-                      </label>
-                      <label>Quantidade
-                        <input id="captureQty" type="number" min="1" value="1" />
-                      </label>
-                      <button id="addCapturePoint" class="btn btn-primary" type="button">Adicionar</button>
-                    </div>
-                    <div id="captureDetails" class="capture-details"><div class="capture-empty">Nenhum ponto de captura adicionado.</div></div>
-                  </div>
-                </div>
-              </details>
-
-              <details class="qual-section" open>
-                <summary>Dados do cliente</summary>
-                <div class="proposal-form-grid">
-                  <label>CPF<input type="text" placeholder="Preencha com CPF" /></label>
-                  <label>Email do cliente<input type="email" placeholder="Preencha o email" /></label>
-                  <label>Data de nascimento<input type="text" placeholder="dd / mm / aaaa" /></label>
-                  <label>Ocupação<input type="text" placeholder="Informe a ocupação" /></label>
-                  <label>Renda mensal<input type="text" placeholder="Informe a renda" /></label>
-                </div>
-                <h4 class="subsection-title">Endereço</h4>
-                <div class="cep-lookup-row">
-                  <label>CEP<input id="customerCep" type="text" placeholder="Preencha o CEP" maxlength="9" /></label>
-                  <button id="cepLookup" class="btn btn-outline" type="button">Consultar CEP (Correios)</button>
-                  <small id="cepStatus" class="api-status"></small>
-                </div>
-                <div class="proposal-form-grid">
-                  <label>Estado<input id="customerState" type="text" placeholder="UF" /></label>
-                  <label>Cidade<input id="customerCity" type="text" placeholder="Preencha a cidade" /></label>
-                  <label>Bairro<input id="customerDistrict" type="text" placeholder="Preencha o bairro" /></label>
-                  <label>Logradouro<input id="customerStreet" type="text" placeholder="Preencha o logradouro" /></label>
-                  <label>Número<input type="text" placeholder="Preencha o número" /></label>
-                  <label>Complemento<input type="text" placeholder="Preencha o complemento" /></label>
-                  <label>Referência<input type="text" placeholder="Preencha a referência" /></label>
-                </div>
-              </details>
-
-              <details class="qual-section" open>
-                <summary>Horário de funcionamento</summary>
-                <div class="hours-row">
-                  <span class="radio-chip active">Horário comercial</span>
-                  <span class="radio-chip">24 horas</span>
-                  <span class="radio-chip">Personalizado</span>
-                </div>
-                <div class="hours-time">
-                  <label>Segunda a sexta <input type="text" value="09:00" readonly /></label>
-                  <label>&nbsp;<input type="text" value="18:00" readonly /></label>
-                </div>
-              </details>
-
-              <details class="qual-section" open>
-                <summary>Recebimento de Vendas</summary>
-                <p class="info-banner">Os dados preenchidos devem corresponder aos do documento do responsável e verificação de identidade na abertura da Conta Stone.</p>
-                <div class="proposal-form-grid">
-                  <label>CPF do sócio<input type="text" placeholder="080.058.131-80" /></label>
-                  <label>Nome do sócio<input type="text" placeholder="João Vitor" /></label>
-                  <label>Email<input type="email" placeholder="email@exemplo.com" /></label>
-                </div>
-              </details>
-            </div>
-          </div>
-
-          <div class="panel hidden" id="creditedPanel">
-            <div class="panel-body panel-body--no-title credited-body">
-              <h3 id="creditedHeader">CLIENTE CREDENCIADO</h3>
-
-              <nav class="credited-tabs" aria-label="Seções do credenciamento">
-                <button class="credited-tab active" type="button">🏬 Dados Cadastrais</button>
-                <button class="credited-tab" type="button">🤝 Acordo Comercial</button>
-                <button class="credited-tab" type="button">🧾 Terminais</button>
-                <button class="credited-tab" type="button">🔑 Ativação de Produtos</button>
-              </nav>
-
-              <section class="credited-grid">
-                <article class="credited-card">
-                  <h4>
-                    <span class="credited-icon">🏬</span>
-                    Estabelecimento
-                  </h4>
-                  <p><strong>CNPJ:</strong> <span id="credDoc">-</span></p>
-                  <p><strong>Código redeflex:</strong> <span id="credStoneCode">184246488</span></p>
-                  <p><strong>Filial:</strong> <span id="credBranch">-</span></p>
-                  <p><strong>Vendedor:</strong> <span id="credSeller">-</span></p>
-                  <p><strong>Origem:</strong> intraflex</p>
-                  <p><strong>Ciclo de venda:</strong> Funil de Vendas</p>
-                  <!-- Ícone da seção Estabelecimento: substitua o emoji em .credited-icon por <img src="assets/seu-icone-estabelecimento.png" alt="Estabelecimento"> -->
-                </article>
-
-                <article class="credited-card">
-                  <h4>
-                    <span class="credited-icon">👤</span>
-                    Responsável
-                  </h4>
-                  <p><strong>Nome:</strong> <span id="credOwner">-</span></p>
-                  <p><strong>CPF:</strong> <span id="credCpf">73.*****-04</span></p>
-                  <p><strong>E-mail:</strong> <span id="credEmail">restaurantecontemporaneo2025@gmail.com</span></p>
-                  <p><strong>Celular:</strong> <span id="credPhone">-</span></p>
-                  <!-- Ícone da seção Responsável: substitua o emoji por imagem personalizada do cliente -->
-                </article>
-
-                <article class="credited-card">
-                  <h4>
-                    <span class="credited-icon">📍</span>
-                    Endereço
-                  </h4>
-                  <p><strong>CEP:</strong> <span id="credCep">32242270</span></p>
-                  <p><strong>Cidade:</strong> Belo Horizonte</p>
-                  <p><strong>UF:</strong> MG</p>
-                  <p><strong>Bairro:</strong> Centro</p>
-                  <!-- Ícone da seção Endereço: aqui você pode inserir o ícone/mapa desejado -->
-                </article>
-
-                <article class="credited-card">
-                  <h4>
-                    <span class="credited-icon">🏦</span>
-                    Conta
-                  </h4>
-                  <p><strong>Banco:</strong> **********</p>
-                  <p><strong>Agência:</strong> ****</p>
-                  <p><strong>Conta:</strong> ******-*</p>
-                  <p><strong>Status:</strong> Liberado para instalação</p>
-                  <!-- Ícone da seção Conta/Banco: substitua o emoji por imagem de banco quando desejar -->
-                </article>
-              </section>
-            </div>
-          </div>
-        </div>
-
-        <div id="loadingOverlay" class="loading-overlay hidden" aria-live="polite">
-          <div class="loading-box">
-            <div class="loading-spinner"></div>
-            <p>Credenciando cliente... aguarde 5 segundos.</p>
-          </div>
-        </div>
-
-        <footer class="drawer-footer">
-          <small id="saveStatus" class="api-status"></small>
-
-          <div class="footer-actions" id="confirmActions">
-            <button id="backToCompany" class="btn btn-muted hidden" type="button">Voltar</button>
-            <button id="saveLeadData" class="btn btn-outline hidden" type="button">Salvar dados</button>
-            <button id="sendToQualification" class="btn btn-primary hidden" type="button">Enviar para Qualificação</button>
-            <button id="createClient" class="btn btn-primary" type="button">Criar Cliente</button>
-          </div>
-
-          <div class="footer-actions hidden" id="qualificationActions">
-            <button id="loseOpportunity" class="btn btn-danger" type="button">Perder Oportunidade</button>
-            <button id="saveQualification" class="btn btn-muted" type="button">Salvar Dados</button>
-            <button id="generateProposal" class="btn btn-primary" type="button">Gerar Proposta</button>
-          </div>
-
-          <div class="footer-actions hidden" id="proposalActions">
-            <button id="loseOpportunityProposal" class="btn btn-danger" type="button">Perder Oportunidade</button>
-            <button id="saveProposalData" class="btn btn-muted" type="button">Salvar Dados</button>
-            <button id="approveProposal" class="btn btn-primary" type="button">Credenciar</button>
-          </div>
-        </footer>
-      </section>
-    </div>
-
-    <script>
-      const root = document.documentElement;
-      const drawer = document.getElementById('leadDrawer');
-      const openLeadButton = document.getElementById('openLeadButton');
-      const minimizeLead = document.getElementById('minimizeLead');
-      const closeLead = document.getElementById('closeLead');
-
-      const drawerTitle = document.getElementById('drawerTitle');
-      const companyPanel = document.getElementById('companyPanel');
-      const confirmPanel = document.getElementById('confirmPanel');
-      const qualificationPanel = document.getElementById('qualificationPanel');
-      const proposalPanel = document.getElementById('proposalPanel');
-      const creditedPanel = document.getElementById('creditedPanel');
-      const backToCompany = document.getElementById('backToCompany');
-      const stepper = document.getElementById('stepper');
-
-      const confirmActions = document.getElementById('confirmActions');
-      const qualificationActions = document.getElementById('qualificationActions');
-      const proposalActions = document.getElementById('proposalActions');
-
-      const leadCount = document.getElementById('leadCount');
-      const leadList = document.getElementById('leadList');
-      const leadEmptyState = document.getElementById('leadEmptyState');
-      const creditedCards = document.getElementById('creditedCards');
-      const creditedCount = document.getElementById('creditedCount');
-
-      const doc = document.getElementById('doc');
-      const fantasy = document.getElementById('fantasy');
-      const legalName = document.getElementById('legalName');
-      const industry = document.getElementById('industry');
-      const cnpjLookup = document.getElementById('cnpjLookup');
-      const apiStatus = document.getElementById('apiStatus');
-      const createClient = document.getElementById('createClient');
-      const saveStatus = document.getElementById('saveStatus');
-
-      const saveLeadData = document.getElementById('saveLeadData');
-      const sendToQualification = document.getElementById('sendToQualification');
-
-      const fullName = document.getElementById('fullName');
-      const phone = document.getElementById('phone');
-      const product = document.getElementById('product');
-      const branchUf = document.getElementById('branchUf');
-      const sellerName = document.getElementById('sellerName');
-
-      const qualDoc = document.getElementById('qualDoc');
-      const qualFantasy = document.getElementById('qualFantasy');
-      const qualOwner = document.getElementById('qualOwner');
-      const qualPhone = document.getElementById('qualPhone');
-      const proposalDoc = document.getElementById('proposalDoc');
-      const proposalFantasy = document.getElementById('proposalFantasy');
-      const proposalOwner = document.getElementById('proposalOwner');
-      const proposalPhone = document.getElementById('proposalPhone');
-      const proposalRevenue = document.getElementById('proposalRevenue');
-      const proposalProduct = document.getElementById('proposalProduct');
-      const credDoc = document.getElementById('credDoc');
-      const credOwner = document.getElementById('credOwner');
-      const credPhone = document.getElementById('credPhone');
-      const credBranch = document.getElementById('credBranch');
-      const credSeller = document.getElementById('credSeller');
-      const creditedHeader = document.getElementById('creditedHeader');
-      const pdvRevenue = document.getElementById('pdvRevenue');
-      const saveQualification = document.getElementById('saveQualification');
-      const loseOpportunity = document.getElementById('loseOpportunity');
-      const generateProposal = document.getElementById('generateProposal');
-      const loseOpportunityProposal = document.getElementById('loseOpportunityProposal');
-      const saveProposalData = document.getElementById('saveProposalData');
-      const approveProposal = document.getElementById('approveProposal');
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      const customerCep = document.getElementById('customerCep');
-      const customerState = document.getElementById('customerState');
-      const customerCity = document.getElementById('customerCity');
-      const customerDistrict = document.getElementById('customerDistrict');
-      const customerStreet = document.getElementById('customerStreet');
-      const cepLookup = document.getElementById('cepLookup');
-      const cepStatus = document.getElementById('cepStatus');
-      const captureType = document.getElementById('captureType');
-      const captureModel = document.getElementById('captureModel');
-      const captureQty = document.getElementById('captureQty');
-      const addCapturePoint = document.getElementById('addCapturePoint');
-      const captureDetails = document.getElementById('captureDetails');
-
-      let leadNumber = 0;
-      let creditedModelRegistered = false;
-
-      const setActiveStep = (step) => {
-        stepper.querySelectorAll('li').forEach((item) => item.classList.remove('active'));
-        const target = stepper.querySelector(`li[data-step="${step}"]`);
-        if (target) target.classList.add('active');
-      };
-
-      const formatCep = (value) => {
-        const digits = value.replace(/\D/g, '').slice(0, 8);
-        if (digits.length <= 5) return digits;
-        return `${digits.slice(0, 5)}-${digits.slice(5)}`;
-      };
-
-      const getFilialByDdd = (phoneValue) => {
-        const ddd = phoneValue.replace(/\D/g, '').slice(0, 2);
-        const ufByDdd = {
-          '11': 'SP',
-          '21': 'RJ',
-          '31': 'MG',
-          '41': 'PR',
-          '51': 'RS',
-          '61': 'DF',
-          '71': 'BA'
-        };
-        return ufByDdd[ddd] || '--';
-      };
-
-      const registerCreditedModelCard = () => {
-        if (creditedModelRegistered) return;
-
-        const card = document.createElement('div');
-        card.className = 'deal-card success credited-model-card open-credited-card';
-        card.innerHTML = `
-          <h3>${(fantasy.value || legalName.value || "Nome Fantasia").toUpperCase()}</h3>
-          <p><b>Filial:</b> ${branchUf.value || getFilialByDdd(phone.value)}</p>
-          <p><b>Tipo:</b> Adquirente</p>
-          <p><b>Vendedor:</b> ${sellerName.value || ""}</p>
-          <p><b>Documento:</b> ${doc.value || ""}</p>
-          <div class="credited-model-status">Liberado para instalação</div>
-          <div class="credited-model-date">📅 Data de lançamento/liberação: ${new Date().toLocaleDateString('pt-BR')}</div>
-        `;
-
-        creditedCards.prepend(card);
-        creditedModelRegistered = true;
-
-        const current = Number(creditedCount.textContent || '0');
-        creditedCount.textContent = String(current + 1);
-      };
-
-      const showCompanyStep = () => {
-        drawerTitle.classList.remove('hidden');
-        drawerTitle.textContent = 'Cliente Novo';
-        companyPanel.classList.remove('hidden');
-        confirmPanel.classList.add('hidden');
-        qualificationPanel.classList.add('hidden');
-        proposalPanel.classList.add('hidden');
-        creditedPanel.classList.add('hidden');
-        backToCompany.classList.add('hidden');
-        saveLeadData.classList.add('hidden');
-        sendToQualification.classList.add('hidden');
-        sendToQualification.disabled = false;
-        createClient.classList.remove('hidden');
-        createClient.disabled = false;
-        confirmActions.classList.remove('hidden');
-        qualificationActions.classList.add('hidden');
-        proposalActions.classList.add('hidden');
-        setActiveStep('1');
-      };
-
-      const showConfirmStep = () => {
-        companyPanel.classList.add('hidden');
-        confirmPanel.classList.remove('hidden');
-        qualificationPanel.classList.add('hidden');
-        proposalPanel.classList.add('hidden');
-        creditedPanel.classList.add('hidden');
-        backToCompany.classList.remove('hidden');
-        saveLeadData.classList.remove('hidden');
-        sendToQualification.classList.remove('hidden');
-        createClient.classList.add('hidden');
-        confirmActions.classList.remove('hidden');
-        qualificationActions.classList.add('hidden');
-        proposalActions.classList.add('hidden');
-      };
-
-      const showQualificationStep = () => {
-        drawerTitle.classList.remove('hidden');
-        drawerTitle.textContent = `${fullName.value.trim() || 'Cliente'} - ${doc.value || '-'}`;
-        companyPanel.classList.add('hidden');
-        confirmPanel.classList.add('hidden');
-        qualificationPanel.classList.remove('hidden');
-        proposalPanel.classList.add('hidden');
-        creditedPanel.classList.add('hidden');
-        confirmActions.classList.add('hidden');
-        qualificationActions.classList.remove('hidden');
-        proposalActions.classList.add('hidden');
-        setActiveStep('2');
-
-        qualDoc.textContent = doc.value || '-';
-        qualFantasy.textContent = fantasy.value || legalName.value || '-';
-        qualOwner.textContent = fullName.value || '-';
-        qualPhone.textContent = phone.value || '-';
-      };
-
-
-      const showProposalStep = () => {
-        drawerTitle.classList.remove('hidden');
-        drawerTitle.textContent = `${fullName.value.trim() || 'Cliente'} - ${doc.value || '-'}`;
-        companyPanel.classList.add('hidden');
-        confirmPanel.classList.add('hidden');
-        qualificationPanel.classList.add('hidden');
-        proposalPanel.classList.remove('hidden');
-        creditedPanel.classList.add('hidden');
-        confirmActions.classList.add('hidden');
-        qualificationActions.classList.add('hidden');
-        proposalActions.classList.remove('hidden');
-        setActiveStep('3');
-
-        proposalDoc.textContent = doc.value || '-';
-        proposalFantasy.textContent = fantasy.value || legalName.value || '-';
-        proposalOwner.textContent = fullName.value || '-';
-        proposalPhone.textContent = phone.value || '-';
-        proposalRevenue.textContent = pdvRevenue.value ? `R$ ${pdvRevenue.value}` : '-';
-
-        const productMap = {
-          adquirencia: 'Adquirência',
-          'adquirencia-voucher': 'Adquirência / Voucher',
-          fisico: 'Físico',
-        };
-        proposalProduct.textContent = productMap[product.value] || '-';
-      };
-
-      const showCreditedStep = () => {
-        drawerTitle.classList.add('hidden');
-        companyPanel.classList.add('hidden');
-        confirmPanel.classList.add('hidden');
-        qualificationPanel.classList.add('hidden');
-        proposalPanel.classList.add('hidden');
-        creditedPanel.classList.remove('hidden');
-
-        confirmActions.classList.add('hidden');
-        qualificationActions.classList.add('hidden');
-        proposalActions.classList.add('hidden');
-
-        setActiveStep('4');
-
-        const displayName = fantasy.value || legalName.value || 'CLIENTE CREDENCIADO';
-        creditedHeader.textContent = `${displayName.toUpperCase()} - ${doc.value || '-'}`;
-        credDoc.textContent = doc.value || '-';
-        credOwner.textContent = fullName.value || '-';
-        credPhone.textContent = phone.value || '-';
-        credBranch.textContent = branchUf.value || getFilialByDdd(phone.value);
-        credSeller.textContent = sellerName.value || "-";
-      };
-
-      const openDrawer = () => {
-        drawer.classList.add('open');
-        drawer.setAttribute('aria-hidden', 'false');
-        showCompanyStep();
-      };
-
-      const closeDrawerFn = (registerCard = false) => {
-        drawer.classList.remove('open');
-        drawer.setAttribute('aria-hidden', 'true');
-        if (registerCard) registerCreditedModelCard();
-      };
-
-      const formatCpf = (digits) =>
-        digits
-          .replace(/(\d{3})(\d)/, '$1.$2')
-          .replace(/(\d{3})(\d)/, '$1.$2')
-          .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-
-      const formatCnpj = (digits) =>
-        digits
-          .replace(/^(\d{2})(\d)/, '$1.$2')
-          .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-          .replace(/\.(\d{3})(\d)/, '.$1/$2')
-          .replace(/(\d{4})(\d)/, '$1-$2');
-
-      const formatDocumento = (value) => {
-        const digits = value.replace(/\D/g, '').slice(0, 14);
-        if (digits.length <= 11) return formatCpf(digits);
-        return formatCnpj(digits);
-      };
-
-      const formatPhone = (value) => {
-        const digits = value.replace(/\D/g, '').slice(0, 11);
-
-        if (digits.length <= 10) {
-          return digits
-            .replace(/^(\d{2})(\d)/, '($1) $2')
-            .replace(/(\d{4})(\d)/, '$1-$2');
-        }
-
-        return digits
-          .replace(/^(\d{2})(\d)/, '($1) $2')
-          .replace(/(\d{5})(\d)/, '$1-$2');
-      };
-
-      const formatCurrency = (value) => {
-        const digits = value.replace(/\D/g, '');
-        if (!digits) return '';
-        const number = Number(digits) / 100;
-        return number.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      };
-
-      const getDocDigits = () => doc.value.replace(/\D/g, '');
-
-      const populateFromApi = (data) => {
-        fantasy.value = data.nome_fantasia || '';
-        legalName.value = data.razao_social || '';
-
-        const cnae = data.cnae_fiscal_descricao || '';
-        const cnaeCode = data.cnae_fiscal || '';
-        industry.value = cnaeCode && cnae ? `${cnaeCode} - ${cnae}` : cnae || cnaeCode;
-        root.classList.add('is-filled');
-      };
-
-      const validateConfirmStep = () => {
-        if (!fullName.value.trim() || phone.value.replace(/\D/g, '').length < 10 || !product.value || !branchUf.value || !sellerName.value.trim()) {
-          saveStatus.textContent = 'Preencha nome completo, telefone, produto, filial (UF) e vendedor para continuar.';
-          return false;
-        }
-        return true;
-      };
-
-      const saveLeadCard = () => {
-        if (!validateConfirmStep()) return;
-
-        leadNumber += 1;
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'open-lead-card';
-
-        const fantasyName = fantasy.value.trim() || 'Nome fantasia não informado';
-        card.innerHTML = `<strong>${fantasyName}</strong><small>${doc.value}</small>`;
-
-        leadList.prepend(card);
-        leadCount.textContent = String(leadNumber);
-        leadEmptyState.classList.add('hidden');
-
-        saveStatus.textContent = 'Dados salvos no card de Lead Novo.';
-      };
-
-      openLeadButton.addEventListener('click', openDrawer);
-      minimizeLead.addEventListener('click', () => closeDrawerFn(true));
-      closeLead.addEventListener('click', closeDrawerFn);
-      backToCompany.addEventListener('click', showCompanyStep);
-      saveLeadData.addEventListener('click', saveLeadCard);
-
-      leadList.addEventListener('click', (event) => {
-        const target = event.target;
-        if (target.classList.contains('open-lead-card')) {
-          openDrawer();
-        }
-      });
-
-      creditedCards.addEventListener('click', (event) => {
-        const card = event.target.closest('.open-credited-card');
-        if (!card) return;
-        openDrawer();
-        showCreditedStep();
-      });
-
-      doc.addEventListener('input', () => {
-        doc.value = formatDocumento(doc.value);
-        apiStatus.textContent = '';
-        saveStatus.textContent = '';
-      });
-
-      phone.addEventListener('input', () => {
-        phone.value = formatPhone(phone.value);
-        const suggestedUf = getFilialByDdd(phone.value);
-        if (suggestedUf !== '--') branchUf.value = suggestedUf;
-      });
-
-      pdvRevenue.addEventListener('input', () => {
-        pdvRevenue.value = formatCurrency(pdvRevenue.value);
-      });
-
-      cnpjLookup.addEventListener('click', async () => {
-        const digits = getDocDigits();
-
-        if (digits.length === 11) {
-          apiStatus.textContent = 'CPF é permitido para cadastro, mas a consulta automática funciona apenas para CNPJ.';
-          return;
-        }
-
-        if (digits.length !== 14) {
-          apiStatus.textContent = 'Informe um CNPJ válido com 14 dígitos para consultar.';
-          root.classList.remove('is-filled');
-          return;
-        }
-
-        apiStatus.textContent = 'Consultando CNPJ na API pública...';
-
-        try {
-          const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`);
-
-          if (!response.ok) {
-            throw new Error('CNPJ não encontrado na Receita/BR API.');
-          }
-
-          const data = await response.json();
-          populateFromApi(data);
-          apiStatus.textContent = 'Consulta concluída com sucesso.';
-        } catch (error) {
-          apiStatus.textContent = error.message;
-        }
-      });
-
-
-      customerCep.addEventListener('input', () => {
-        customerCep.value = formatCep(customerCep.value);
-      });
-
-      cepLookup.addEventListener('click', async () => {
-        const cepDigits = customerCep.value.replace(/\D/g, '');
-
-        if (cepDigits.length !== 8) {
-          cepStatus.textContent = 'Informe um CEP válido com 8 dígitos para consultar.';
-          return;
-        }
-
-        cepStatus.textContent = 'Consultando CEP (Correios/ViaCEP)...';
-
-        try {
-          const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`);
-          if (!response.ok) throw new Error('Falha ao consultar CEP.');
-
-          const data = await response.json();
-          if (data.erro) throw new Error('CEP não encontrado.');
-
-          customerState.value = data.uf || '';
-          customerCity.value = data.localidade || '';
-          customerDistrict.value = data.bairro || '';
-          customerStreet.value = data.logradouro || '';
-          cepStatus.textContent = 'Consulta de CEP concluída com sucesso.';
-        } catch (error) {
-          cepStatus.textContent = error.message;
-        }
-      });
-
-
-      const captureModelsByType = {
-        POS: ['DX8000', 'MOVE5000'],
-        TEF: ['LANE3000']
-      };
-
-      const refreshCaptureModels = () => {
-        const selectedType = captureType.value;
-        const models = captureModelsByType[selectedType] || [];
-        captureModel.innerHTML = models.map((m) => `<option value="${m}">${m}</option>`).join('');
-      };
-
-      captureType.addEventListener('change', refreshCaptureModels);
-
-      addCapturePoint.addEventListener('click', () => {
-        const type = captureType.value;
-        const model = captureModel.value;
-        const qty = Math.max(1, Number(captureQty.value || 1));
-
-        const empty = captureDetails.querySelector('.capture-empty');
-        if (empty) empty.remove();
-
-        const detail = document.createElement('div');
-        detail.className = 'capture-detail-item';
-        detail.innerHTML = `
-          <div class="capture-detail-top">
-            <strong>${type}</strong>
-            <span class="capture-badge">${qty} un.</span>
-          </div>
-          <div class="capture-detail-meta">Modelo selecionado: <b>${model}</b></div>
-        `;
-        captureDetails.prepend(detail);
-      });
-
-      refreshCaptureModels();
-
-      createClient.addEventListener('click', () => {
-        const digits = getDocDigits();
-
-        if (digits.length !== 11 && digits.length !== 14) {
-          saveStatus.textContent = 'Para cadastrar, informe um CPF (11) ou CNPJ (14) válido.';
-          return;
-        }
-
-        saveStatus.textContent = 'Cadastro base concluído. Escolha: salvar dados, enviar para Qualificação ou voltar.';
-        showConfirmStep();
-      });
-
-      sendToQualification.addEventListener('click', () => {
-        if (!validateConfirmStep()) return;
-        saveStatus.textContent = 'Etapa de Qualificação aberta. Informe o faturamento bruto do PDV.';
-        showQualificationStep();
-      });
-
-      saveQualification.addEventListener('click', () => {
-        if (!pdvRevenue.value.trim()) {
-          saveStatus.textContent = 'Informe o faturamento bruto do PDV para salvar.';
-          return;
-        }
-        saveStatus.textContent = 'Dados da Qualificação salvos com sucesso.';
-      });
-
-      loseOpportunity.addEventListener('click', () => {
-        setActiveStep('lost');
-        saveStatus.textContent = 'Oportunidade marcada como perdida.';
-      });
-
-      generateProposal.addEventListener('click', () => {
-        if (!pdvRevenue.value.trim()) {
-          saveStatus.textContent = 'Preencha o faturamento bruto do PDV antes de gerar proposta.';
-          return;
-        }
-        saveStatus.textContent = 'Etapa de Proposta aberta com ofertas pré-aprovadas.';
-        showProposalStep();
-      });
-
-      saveProposalData.addEventListener('click', () => {
-        saveStatus.textContent = 'Dados da proposta salvos (protótipo).';
-      });
-
-      loseOpportunityProposal.addEventListener('click', () => {
-        setActiveStep('lost');
-        saveStatus.textContent = 'Oportunidade marcada como perdida.';
-      });
-
-      approveProposal.addEventListener('click', () => {
-        loadingOverlay.classList.remove('hidden');
-        approveProposal.disabled = true;
-
-        setTimeout(() => {
-          loadingOverlay.classList.add('hidden');
-          approveProposal.disabled = false;
-          showCreditedStep();
-          saveStatus.textContent = 'Cliente credenciado com sucesso (protótipo).';
-        }, 5000);
-      });
-
-    </script>
-  </body>
-</html>
+:root {
+  --bg: #f1f2f4;
+  --panel: #ffffff;
+  --text: #1f2430;
+  --muted: #7b818c;
+  --line: #d9dbe0;
+  --red-dark: #7f1320;
+  --red-soft: #a62d3a;
+  --green: #27a56f;
+}
+
+* { box-sizing: border-box; }
+
+.hidden { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow Semi Condensed', sans-serif;
+}
+
+.layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 84px 1fr;
+}
+
+.sidebar {
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding-top: 14px;
+}
+
+.brand { color: #7de5b2; font-size: 1.6rem; }
+
+.sidebar nav { display: flex; flex-direction: column; gap: 12px; }
+
+.nav-btn {
+  width: 48px;
+  height: 48px;
+  border: 1px solid #e7e9ed;
+  border-radius: 12px;
+  background: #fff;
+  color: #98a1af;
+  font-size: 1rem;
+}
+
+.nav-btn.active {
+  background: #fae8eb;
+  color: var(--red-dark);
+  border-color: #efc6cd;
+}
+
+.main { padding: 14px 16px; }
+
+.main-header { display: flex; justify-content: space-between; align-items: center; }
+
+.main-header h1 {
+  margin: 0;
+  font-size: 2.05rem;
+  font-weight: 700;
+}
+
+.header-actions { display: flex; gap: 10px; }
+
+.btn {
+  border: 0;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+
+.btn-primary { background: var(--red-dark); color: #fff; }
+.btn-muted { background: #e9eaee; color: #293041; }
+.btn-outline { border: 1px solid #cfafb6; background: #fff7f8; color: var(--red-dark); }
+.btn-danger { background: #f5e4e6; color: #cb3948; }
+
+.filters {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.filters input {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  height: 40px;
+  padding: 0 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  min-width: 220px;
+}
+
+.kanban {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.column {
+  border-top: 4px solid #e0c4c8;
+  border-radius: 10px;
+  background: #f8f8f9;
+  min-height: 220px;
+  padding: 8px;
+}
+
+.column header { display: flex; justify-content: space-between; align-items: center; }
+
+.column h2 { margin: 0; font-size: 1.05rem; }
+
+.column span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e5e6ea;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.82rem;
+}
+
+.open-lead-card {
+  width: 100%;
+  margin-top: 8px;
+  border: 1px solid #e7ced3;
+  border-radius: 8px;
+  background: #fff;
+  text-align: left;
+  padding: 8px;
+  font-family: inherit;
+  font-size: 0.88rem;
+}
+
+
+.open-lead-card strong {
+  display: block;
+  font-size: 0.92rem;
+  color: #222836;
+  margin-bottom: 2px;
+}
+
+.open-lead-card small {
+  display: block;
+  font-size: 0.8rem;
+  color: #687081;
+}
+
+.empty-state {
+  margin: 10px 2px 0;
+  color: #8a909a;
+  font-size: 0.9rem;
+}
+
+.lead-list {
+  display: grid;
+  gap: 8px;
+}
+
+.deal-card {
+  margin-top: 8px;
+  border: 1px solid #e7ced3;
+  border-top: 3px solid #3dc1a0;
+  border-radius: 8px;
+  background: #fff;
+  padding: 9px;
+}
+
+.deal-card.success { border-top-color: #278d64; }
+.deal-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+.deal-card p { margin: 4px 0; font-size: 0.92rem; }
+
+.column-proposta { border-top-color: #a7d7e6; }
+.column-credenciado { border-top-color: #309668; }
+.column-lost { border-top-color: #e59aa5; }
+
+.lead-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(76vw, 1280px);
+  height: 100vh;
+  background: var(--bg);
+  border-left: 1px solid var(--line);
+  transform: translateX(100%);
+  transition: transform 220ms ease;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  z-index: 30;
+}
+
+.lead-drawer.open { transform: translateX(0); }
+
+.drawer-top {
+  height: 66px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+}
+
+.icon-btn {
+  border: 0;
+  background: transparent;
+  color: #073a2c;
+  font-size: 1.15rem;
+  font-family: inherit;
+}
+
+.stepper {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.stepper li {
+  color: #8a8f98;
+  font-size: 0.98rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.stepper li span {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #c6cad2;
+  display: inline-grid;
+  place-items: center;
+}
+
+.stepper li.active { color: var(--red-dark); }
+.stepper li.active span { border-color: #d4a0a8; }
+
+.drawer-content { padding: 14px 12px; overflow-y: auto; min-height: 0; }
+.drawer-content h2 { margin: 0 0 10px; font-size: 1.9rem; }
+
+.panel { border: 1px solid #c9ccd2; border-radius: 10px; }
+
+.panel-title {
+  border-bottom: 1px solid #c9ccd2;
+  padding: 10px 12px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+}
+
+.panel-body { padding: 10px 12px 14px; }
+.panel-body--no-title { padding-top: 12px; }
+.panel-body h3 { margin: 0 0 10px; font-size: 1.1rem; }
+
+.lead-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.lead-form label {
+  font-size: 0.95rem;
+  color: #6f7785;
+  font-weight: 600;
+  display: grid;
+  gap: 6px;
+}
+
+.lead-form input,
+.lead-form select {
+  border: 1px solid #c9ccd2;
+  border-radius: 10px;
+  height: 42px;
+  padding: 0 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #2f3440;
+  background: #fff;
+}
+
+.doc-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+
+
+.qual-section {
+  border: 1px solid #d8dbe1;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.qual-section summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 10px 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #253041;
+}
+
+.qual-section[open] summary {
+  border-bottom: 1px solid #eceef2;
+}
+
+.qual-section summary::-webkit-details-marker { display: none; }
+
+.qual-grid {
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.qual-grid p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.qual-field {
+  padding: 10px 12px 12px;
+  display: grid;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: #6f7785;
+  font-weight: 600;
+}
+
+.money-input {
+  height: 40px;
+  border: 1px solid #ccd1d9;
+  border-radius: 10px;
+  background: #fff;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  padding: 0 10px;
+  max-width: 240px;
+}
+
+.money-input span {
+  font-size: 0.9rem;
+  color: #5f6a7a;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.money-input input {
+  border: 0;
+  outline: none;
+  height: 100%;
+  padding: 0;
+  font-size: 0.95rem;
+  background: transparent;
+}
+
+.qual-section:not([open]) {
+  background: #f7f8fa;
+}
+
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 10px;
+  padding: 10px 12px 12px;
+}
+
+.offers-grid--proposal {
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+}
+
+.offer-card {
+  border: 1px solid #d9dee6;
+  border-radius: 14px;
+  background: #fff;
+  padding: 12px;
+}
+
+.offer-card--model {
+  position: relative;
+}
+
+.offer-badge {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  background: #c40000;
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 0 12px 0 12px;
+}
+
+.offer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.offer-card h4 {
+  margin: 0;
+  font-size: 1.04rem;
+  color: #c10000;
+}
+
+.offer-card h4 strong {
+  color: #8f0010;
+}
+
+.offer-logo {
+  width: 88px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.offer-feature-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+  font-size: 0.92rem;
+  color: #232c3a;
+}
+
+.offer-feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.feature-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #fff;
+  flex: 0 0 14px;
+}
+
+.feature-icon--ok { background: #2dbf78; }
+.feature-icon--off { background: #9ba3b1; }
+
+.offer-rates {
+  margin-top: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.offer-rates__head,
+.offer-rates__row {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(4, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+
+.offer-rates__head {
+  color: #687284;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.offer-rates__row {
+  color: #b51010;
+  font-size: 0.88rem;
+}
+
+.offer-brand .brand-logo {
+  width: 56px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.offer-info-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.offer-panel {
+  background: #fff;
+}
+
+.offer-panel h5 {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  background: #f1f2f4;
+  padding: 4px 6px;
+  font-weight: 700;
+  color: #303a49;
+}
+
+.offer-panel p {
+  margin: 0;
+  padding: 2px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #3e4858;
+}
+
+.offer-panel strong { font-weight: 700; color: #3a465b; }
+
+.offer-highlight {
+  margin-top: 4px !important;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: flex-start !important;
+  font-size: 0.83rem !important;
+  color: #2b3547 !important;
+}
+
+.offer-panel--pix {
+  margin-top: 10px;
+  max-width: 42%;
+}
+
+.input-wrap { position: relative; }
+.ok {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  place-items: center;
+  background: var(--green);
+  color: #fff;
+  font-size: 0.62rem;
+}
+
+.api-status { min-height: 16px; font-size: 0.8rem; color: #677081; }
+.is-filled #doc + .ok { display: inline-grid; }
+
+.drawer-footer {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.proposal-simulate {
+  padding: 10px 12px 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.simulate-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+}
+
+.simulate-card {
+  border: 1px solid #dde2ea;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+}
+
+.brand-rates { display: grid; gap: 6px; }
+.brand-row {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 8px;
+  font-size: 0.85rem;
+}
+.brand-head { font-weight: 700; color: #5f6b7d; }
+
+.brand-cell {
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 28px;
+  object-fit: contain;
+  border: 1px solid #e1e5ec;
+  border-radius: 6px;
+  background: #fff;
+  display: block;
+}
+
+.simulate-card--aside { display: grid; gap: 8px; align-content: start; }
+.simulate-kv {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  border-bottom: 1px solid #edf0f5;
+  padding-bottom: 6px;
+}
+
+.simulate-machine {
+  border: 1px solid #dde2ea;
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.simulate-machine__head {
+  display: flex;
+  justify-content: space-between;
+  color: #536074;
+}
+
+.simulate-machine__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(96px, 1fr));
+  gap: 6px;
+  align-items: end;
+}
+
+.simulate-machine__grid label {
+  font-size: 0.82rem;
+  color: #647084;
+  font-weight: 600;
+  display: grid;
+  gap: 4px;
+}
+
+.simulate-machine__grid input {
+  border: 1px solid #c9ced8;
+  border-radius: 8px;
+  height: 34px;
+  padding: 0 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.simulate-machine__grid select {
+  border: 1px solid #c9ced8;
+  border-radius: 8px;
+  height: 34px;
+  padding: 0 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.capture-details {
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.capture-empty {
+  border: 1px dashed #cfd8e3;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.84rem;
+  color: #78869a;
+  background: #fbfcfe;
+}
+
+.capture-detail-item {
+  border: 1px solid #d5e3ef;
+  border-radius: 10px;
+  padding: 9px 10px;
+  color: #2f4a60;
+  background: linear-gradient(180deg, #ffffff, #f7fbff);
+  box-shadow: 0 2px 6px rgba(18, 48, 78, 0.06);
+}
+
+.capture-detail-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  font-size: 0.9rem;
+}
+
+.capture-badge {
+  border-radius: 999px;
+  background: #e8f6ee;
+  color: #1c7f56;
+  border: 1px solid #cde8da;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.capture-detail-meta {
+  font-size: 0.82rem;
+  color: #63758c;
+}
+
+.simulate-machine__grid .btn {
+  height: 34px;
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 0.9rem;
+}
+
+.proposal-form-grid {
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.proposal-form-grid label {
+  font-size: 0.9rem;
+  color: #677284;
+  font-weight: 600;
+  display: grid;
+  gap: 6px;
+}
+
+.proposal-form-grid input {
+  border: 1px solid #c9ccd2;
+  border-radius: 10px;
+  height: 40px;
+  padding: 0 10px;
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+
+.subsection-title {
+  margin: 2px 12px;
+  font-size: 1rem;
+  color: #2d3747;
+}
+
+.hours-row {
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.radio-chip {
+  border: 1px solid #d1d5dd;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  color: #4e5868;
+}
+
+.radio-chip.active { background: #e8f7ef; border-color: #7bc49b; color: #287f53; }
+
+.hours-time {
+  padding: 0 12px 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.hours-time label {
+  font-size: 0.85rem;
+  color: #687385;
+  font-weight: 600;
+  display: grid;
+  gap: 6px;
+}
+
+.hours-time input {
+  border: 1px solid #c9ccd2;
+  border-radius: 10px;
+  height: 38px;
+  padding: 0 10px;
+  width: 90px;
+}
+
+.info-banner {
+  margin: 10px 12px 0;
+  background: #edf4ff;
+  border: 1px solid #d4e2fb;
+  color: #425369;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.86rem;
+}
+
+
+
+.credited-body {
+  display: grid;
+  gap: 10px;
+}
+
+.credited-body h3 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.credited-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.credited-tab {
+  border: 1px solid #cfd6de;
+  background: #fff;
+  color: #2f3a4a;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.credited-tab.active {
+  border-color: #1ea76e;
+  color: #1ea76e;
+  background: #ecf9f2;
+}
+
+.credited-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.credited-card {
+  border: 1px solid #d7e1de;
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px;
+}
+
+.credited-card h4 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.credited-card p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+}
+
+.credited-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-grid;
+  place-items: center;
+  color: #1ea76e;
+}
+
+
+
+.cep-lookup-row {
+  padding: 10px 12px 0;
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) auto 1fr;
+  gap: 8px;
+  align-items: end;
+}
+
+.cep-lookup-row label {
+  font-size: 0.9rem;
+  color: #677284;
+  font-weight: 600;
+  display: grid;
+  gap: 6px;
+}
+
+.cep-lookup-row input {
+  border: 1px solid #c9ccd2;
+  border-radius: 10px;
+  height: 40px;
+  padding: 0 10px;
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(22, 30, 44, 0.38);
+  display: grid;
+  place-items: center;
+  z-index: 40;
+}
+
+.loading-box {
+  background: #fff;
+  border: 1px solid #d9dee6;
+  border-radius: 12px;
+  padding: 18px;
+  min-width: 300px;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.loading-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid #d6dce8;
+  border-top-color: #1ea76e;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.credited-model-card {
+  border-top-color: #27a56f;
+}
+
+.credited-model-status {
+  margin-top: 8px;
+  border-radius: 999px;
+  background: #d8f4e6;
+  color: #1b7f54;
+  font-size: 0.86rem;
+  padding: 6px 10px;
+  display: block;
+  text-align: center;
+}
+
+.credited-model-date {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: #5e6a7a;
+  text-align: center;
+}
+
+@media (max-width: 1280px) {
+  .kanban { grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+  .lead-form { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .main-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .filters { flex-direction: column; align-items: stretch; }
+  .lead-drawer { width: 100vw; }
+  .stepper { flex-wrap: wrap; gap: 8px; }
+  .kanban,
+  .lead-form,
+  .qual-grid,
+  .offers-grid { grid-template-columns: 1fr; }
+  .doc-grid { grid-template-columns: 1fr; }
+  .simulate-layout,
+  .proposal-form-grid,
+  .simulate-machine__grid { grid-template-columns: 1fr; }
+  .offer-panel--pix { max-width: 100%; }
+  .hours-time { flex-direction: column; }
+  .credited-grid { grid-template-columns: 1fr; }
+  .cep-lookup-row { grid-template-columns: 1fr; }
+}
+
+
+.footer-actions { display: flex; gap: 8px; }
+
+.btn:disabled { opacity: 0.65; cursor: not-allowed; }
+
+
+.terminal-sim {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  background: #f6f7f9;
+  border: 1px solid #e2e5ea;
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.machine-thumb {
+  width: 26px;
+  height: 34px;
+  border-radius: 5px;
+  border: 1px solid #cfd4df;
+  object-fit: cover;
+  display: block;
+}
+
+.terminal-name {
+  font-size: 0.82rem;
+  color: #404a5b;
+}
+
+.terminal-price {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #4e5566;
+}
+
+
+.open-credited-card { cursor: pointer; }
+.open-credited-card:hover { box-shadow: 0 2px 8px rgba(15, 25, 40, 0.08); }
