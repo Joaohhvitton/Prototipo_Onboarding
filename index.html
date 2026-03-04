@@ -46,18 +46,12 @@
             <div id="leadList" class="lead-list"></div>
           </article>
 
-          <article class="column"><header><h2>Qualificação</h2><span>0</span></header></article>
+          <article class="column"><header><h2>Qualificação</h2><span id="qualificationCount">0</span></header><p class="empty-state" id="qualificationEmptyState">Nenhuma qualificação em andamento.</p><div id="qualificationCards" class="lead-list"></div></article>
 
           <article class="column column-proposta">
-            <header><h2>Proposta</h2><span>1</span></header>
-            <div class="deal-card">
-              <h3>MERCADINHO RAMOS</h3>
-              <p><b>Filial:</b> Flex Pagamentos</p>
-              <p><b>Documento:</b> 37.163.989/0001-64</p>
-              <p><b>Vendedor:</b> João Vitor Oliveira de Lima</p>
-              <p><b>Cliente:</b> ANDRO DE OLIVEIRA RAMOS</p>
-              <p><b>Contato:</b> (77) 98854-1288</p>
-            </div>
+            <header><h2>Proposta</h2><span id="proposalCount">0</span></header>
+            <p class="empty-state" id="proposalEmptyState">Nenhuma proposta em andamento.</p>
+            <div id="proposalCards" class="lead-list"></div>
           </article>
 
           <article class="column column-credenciado">
@@ -310,7 +304,7 @@
 
                     <section class="offer-panel offer-panel--pix">
                       <h5>Pix</h5>
-                      <p><span>PIX</span><strong>R$ 0,69</strong></p>
+                      <p><span class="offer-brand"><img class="brand-logo" src="pix img.png" alt="PIX" /></span><span>PIX</span><strong>R$ 0,69</strong></p>
                     </section>
                   </article>
                 </div>
@@ -376,7 +370,7 @@
                 <h4 class="subsection-title">Endereço</h4>
                 <div class="cep-lookup-row">
                   <label>CEP<input id="customerCep" type="text" placeholder="Preencha o CEP" maxlength="9" /></label>
-                  <button id="cepLookup" class="btn btn-outline" type="button">Consultar CEP (Correios)</button>
+                  <button id="cepLookup" class="btn btn-outline" type="button">Consultar CEP</button>
                   <small id="cepStatus" class="api-status"></small>
                 </div>
                 <div class="proposal-form-grid">
@@ -536,6 +530,12 @@
       const leadCount = document.getElementById('leadCount');
       const leadList = document.getElementById('leadList');
       const leadEmptyState = document.getElementById('leadEmptyState');
+      const qualificationCards = document.getElementById('qualificationCards');
+      const qualificationCount = document.getElementById('qualificationCount');
+      const qualificationEmptyState = document.getElementById('qualificationEmptyState');
+      const proposalCards = document.getElementById('proposalCards');
+      const proposalCount = document.getElementById('proposalCount');
+      const proposalEmptyState = document.getElementById('proposalEmptyState');
       const creditedCards = document.getElementById('creditedCards');
       const creditedCount = document.getElementById('creditedCount');
 
@@ -548,6 +548,8 @@
       const createClient = document.getElementById('createClient');
       const saveStatus = document.getElementById('saveStatus');
 
+      const leadForm = document.getElementById('leadForm');
+      const confirmForm = document.getElementById('confirmForm');
       const saveLeadData = document.getElementById('saveLeadData');
       const sendToQualification = document.getElementById('sendToQualification');
 
@@ -594,10 +596,11 @@
       const addCapturePoint = document.getElementById('addCapturePoint');
       const captureDetails = document.getElementById('captureDetails');
 
-      let leadNumber = 0;
-      let creditedModelRegistered = false;
+      let currentStep = '1';
+      let activeProposalDoc = '';
 
       const setActiveStep = (step) => {
+        currentStep = step;
         stepper.querySelectorAll('li').forEach((item) => item.classList.remove('active'));
         const target = stepper.querySelector(`li[data-step="${step}"]`);
         if (target) target.classList.add('active');
@@ -624,10 +627,13 @@
       };
 
       const registerCreditedModelCard = () => {
-        if (creditedModelRegistered) return;
+        const docKey = getCurrentDocKey();
+        if (!docKey) return;
+        if (creditedCards.querySelector(`.open-credited-card[data-doc="${docKey}"]`)) return;
 
         const card = document.createElement('div');
         card.className = 'deal-card success credited-model-card open-credited-card';
+        card.dataset.doc = docKey;
         card.innerHTML = `
           <h3>${(fantasy.value || legalName.value || "Nome Fantasia").toUpperCase()}</h3>
           <p><b>Filial:</b> ${branchUf.value || getFilialByDdd(phone.value)}</p>
@@ -639,10 +645,153 @@
         `;
 
         creditedCards.prepend(card);
-        creditedModelRegistered = true;
 
         const current = Number(creditedCount.textContent || '0');
         creditedCount.textContent = String(current + 1);
+      };
+
+
+      const getCurrentDocKey = () => doc.value.replace(/\D/g, '');
+      const getFlowDisplayName = () => fantasy.value.trim() || legalName.value.trim() || 'Cliente';
+
+      const syncLeadCount = () => {
+        const total = leadList.querySelectorAll('.open-lead-card[data-doc]').length;
+        leadCount.textContent = String(total);
+        leadEmptyState.classList.toggle('hidden', total > 0);
+      };
+
+      const upsertLeadCard = () => {
+        const docKey = getCurrentDocKey();
+        if (!docKey) return false;
+
+        let card = leadList.querySelector(`.open-lead-card[data-doc="${docKey}"]`);
+        if (!card) {
+          card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'open-lead-card';
+          card.dataset.doc = docKey;
+          leadList.prepend(card);
+        }
+
+        const displayName = getFlowDisplayName().toUpperCase();
+        card.innerHTML = `<strong>${displayName}</strong><small>${doc.value || '-'}</small>`;
+        syncLeadCount();
+        return true;
+      };
+
+      const removeLeadCardByDoc = (docKey) => {
+        if (!docKey) return;
+        const card = leadList.querySelector(`.open-lead-card[data-doc="${docKey}"]`);
+        if (card) card.remove();
+        syncLeadCount();
+      };
+
+      const syncQualificationCount = () => {
+        const total = qualificationCards.querySelectorAll('.open-qualification-card').length;
+        qualificationCount.textContent = String(total);
+        qualificationEmptyState.classList.toggle('hidden', total > 0);
+      };
+
+      const upsertQualificationCard = () => {
+        const docKey = getCurrentDocKey();
+        if (!docKey) return false;
+
+        let card = qualificationCards.querySelector(`.open-qualification-card[data-doc="${docKey}"]`);
+        if (!card) {
+          card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'open-lead-card open-qualification-card';
+          card.dataset.doc = docKey;
+          qualificationCards.prepend(card);
+        }
+
+        const displayName = getFlowDisplayName().toUpperCase();
+        card.innerHTML = `
+          <strong>${displayName}</strong>
+          <small>${doc.value || '-'}</small>
+          <small><b>Faturamento:</b> ${pdvRevenue.value ? `R$ ${pdvRevenue.value}` : '-'}</small>
+        `;
+
+        syncQualificationCount();
+        return true;
+      };
+
+      const removeQualificationCardByDoc = (docKey) => {
+        if (!docKey) return;
+        const card = qualificationCards.querySelector(`.open-qualification-card[data-doc="${docKey}"]`);
+        if (card) card.remove();
+        syncQualificationCount();
+      };
+
+      const syncProposalCount = () => {
+        const total = proposalCards.querySelectorAll('.open-proposal-card').length;
+        proposalCount.textContent = String(total);
+        proposalEmptyState.classList.toggle('hidden', total > 0);
+      };
+
+      const upsertProposalCard = () => {
+        const docKey = getCurrentDocKey();
+        if (!docKey) return;
+
+        let card = proposalCards.querySelector(`.open-proposal-card[data-doc="${docKey}"]`);
+        if (!card) {
+          card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'open-lead-card open-proposal-card';
+          card.dataset.doc = docKey;
+          proposalCards.prepend(card);
+        }
+
+        const displayName = (fantasy.value || legalName.value || 'Cliente sem nome').toUpperCase();
+        card.innerHTML = `
+          <strong>${displayName}</strong>
+          <small>${doc.value || '-'}</small>
+          <small><b>Filial:</b> ${branchUf.value || getFilialByDdd(phone.value)}</small>
+          <small><b>Vendedor:</b> ${sellerName.value || '-'}</small>
+          <small><b>Contato:</b> ${phone.value || '-'}</small>
+        `;
+
+        activeProposalDoc = docKey;
+        syncProposalCount();
+      };
+
+      const removeProposalCardByDoc = (docKey) => {
+        if (!docKey) return;
+        const card = proposalCards.querySelector(`.open-proposal-card[data-doc="${docKey}"]`);
+        if (card) card.remove();
+        if (activeProposalDoc === docKey) activeProposalDoc = '';
+        syncProposalCount();
+      };
+
+      const resetLeadFlow = () => {
+        leadForm.reset();
+        confirmForm.reset();
+        customerCep.value = '';
+        customerState.value = '';
+        customerCity.value = '';
+        customerDistrict.value = '';
+        customerStreet.value = '';
+        pdvRevenue.value = '';
+        apiStatus.textContent = '';
+        cepStatus.textContent = '';
+        saveStatus.textContent = 'Oportunidade removida. Para continuar, crie o cliente novamente.';
+        captureDetails.innerHTML = '<div class="capture-empty">Nenhum ponto de captura adicionado.</div>';
+        refreshCaptureModels();
+      };
+
+      const handleDrawerExit = () => {
+        if (currentStep === '3') {
+          upsertProposalCard();
+          saveStatus.textContent = 'Proposta salva no card de Proposta. Continue de onde parou ao reabrir.';
+        } else if (currentStep === '2') {
+          upsertQualificationCard();
+          saveStatus.textContent = 'Dados salvos no card de Qualificação.';
+        } else if (currentStep === '1') {
+          const saved = upsertLeadCard();
+          if (saved) saveStatus.textContent = 'Dados salvos no card de Lead Novo.';
+        }
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
       };
 
       const showCompanyStep = () => {
@@ -682,7 +831,7 @@
 
       const showQualificationStep = () => {
         drawerTitle.classList.remove('hidden');
-        drawerTitle.textContent = `${fullName.value.trim() || 'Cliente'} - ${doc.value || '-'}`;
+        drawerTitle.textContent = `${getFlowDisplayName()} - ${doc.value || '-'}`;
         companyPanel.classList.add('hidden');
         confirmPanel.classList.add('hidden');
         qualificationPanel.classList.remove('hidden');
@@ -702,7 +851,7 @@
 
       const showProposalStep = () => {
         drawerTitle.classList.remove('hidden');
-        drawerTitle.textContent = `${fullName.value.trim() || 'Cliente'} - ${doc.value || '-'}`;
+        drawerTitle.textContent = `${getFlowDisplayName()} - ${doc.value || '-'}`;
         companyPanel.classList.add('hidden');
         confirmPanel.classList.add('hidden');
         qualificationPanel.classList.add('hidden');
@@ -750,16 +899,17 @@
         credSeller.textContent = sellerName.value || "-";
       };
 
-      const openDrawer = () => {
+      const openDrawer = (step = '1') => {
         drawer.classList.add('open');
         drawer.setAttribute('aria-hidden', 'false');
-        showCompanyStep();
+        if (step === '2') showQualificationStep();
+        else if (step === '3') showProposalStep();
+        else if (step === '4') showCreditedStep();
+        else showCompanyStep();
       };
 
-      const closeDrawerFn = (registerCard = false) => {
-        drawer.classList.remove('open');
-        drawer.setAttribute('aria-hidden', 'true');
-        if (registerCard) registerCreditedModelCard();
+      const closeDrawerFn = () => {
+        handleDrawerExit();
       };
 
       const formatCpf = (digits) =>
@@ -825,39 +975,44 @@
       const saveLeadCard = () => {
         if (!validateConfirmStep()) return;
 
-        leadNumber += 1;
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'open-lead-card';
-
-        const fantasyName = fantasy.value.trim() || 'Nome fantasia não informado';
-        card.innerHTML = `<strong>${fantasyName}</strong><small>${doc.value}</small>`;
-
-        leadList.prepend(card);
-        leadCount.textContent = String(leadNumber);
-        leadEmptyState.classList.add('hidden');
+        if (!upsertLeadCard()) {
+          saveStatus.textContent = 'Informe um CPF/CNPJ válido para salvar no card de Lead Novo.';
+          return;
+        }
 
         saveStatus.textContent = 'Dados salvos no card de Lead Novo.';
       };
 
       openLeadButton.addEventListener('click', openDrawer);
-      minimizeLead.addEventListener('click', () => closeDrawerFn(true));
+      minimizeLead.addEventListener('click', closeDrawerFn);
       closeLead.addEventListener('click', closeDrawerFn);
       backToCompany.addEventListener('click', showCompanyStep);
       saveLeadData.addEventListener('click', saveLeadCard);
 
       leadList.addEventListener('click', (event) => {
-        const target = event.target;
-        if (target.classList.contains('open-lead-card')) {
-          openDrawer();
-        }
+        const card = event.target.closest('.open-lead-card');
+        if (!card) return;
+        openDrawer('1');
+      });
+
+
+      qualificationCards.addEventListener('click', (event) => {
+        const card = event.target.closest('.open-qualification-card');
+        if (!card) return;
+        openDrawer('2');
+      });
+
+      proposalCards.addEventListener('click', (event) => {
+        const card = event.target.closest('.open-proposal-card');
+        if (!card) return;
+        activeProposalDoc = card.dataset.doc || '';
+        openDrawer('3');
       });
 
       creditedCards.addEventListener('click', (event) => {
         const card = event.target.closest('.open-credited-card');
         if (!card) return;
-        openDrawer();
-        showCreditedStep();
+        openDrawer('4');
       });
 
       doc.addEventListener('input', () => {
@@ -989,6 +1144,9 @@
 
       sendToQualification.addEventListener('click', () => {
         if (!validateConfirmStep()) return;
+        const docKey = getCurrentDocKey();
+        removeLeadCardByDoc(docKey);
+        upsertQualificationCard();
         saveStatus.textContent = 'Etapa de Qualificação aberta. Informe o faturamento bruto do PDV.';
         showQualificationStep();
       });
@@ -998,12 +1156,18 @@
           saveStatus.textContent = 'Informe o faturamento bruto do PDV para salvar.';
           return;
         }
-        saveStatus.textContent = 'Dados da Qualificação salvos com sucesso.';
+        upsertQualificationCard();
+        saveStatus.textContent = 'Dados da Qualificação salvos com sucesso no card de Qualificação.';
       });
 
       loseOpportunity.addEventListener('click', () => {
+        const docKey = getCurrentDocKey();
+        removeLeadCardByDoc(docKey);
+        removeQualificationCardByDoc(docKey);
+        removeProposalCardByDoc(docKey);
         setActiveStep('lost');
-        saveStatus.textContent = 'Oportunidade marcada como perdida.';
+        resetLeadFlow();
+        closeDrawerFn();
       });
 
       generateProposal.addEventListener('click', () => {
@@ -1011,8 +1175,11 @@
           saveStatus.textContent = 'Preencha o faturamento bruto do PDV antes de gerar proposta.';
           return;
         }
+        const docKey = getCurrentDocKey();
+        removeQualificationCardByDoc(docKey);
         saveStatus.textContent = 'Etapa de Proposta aberta com ofertas pré-aprovadas.';
         showProposalStep();
+        upsertProposalCard();
       });
 
       saveProposalData.addEventListener('click', () => {
@@ -1020,8 +1187,13 @@
       });
 
       loseOpportunityProposal.addEventListener('click', () => {
+        const docKey = getCurrentDocKey();
+        removeLeadCardByDoc(docKey);
+        removeQualificationCardByDoc(docKey);
+        removeProposalCardByDoc(docKey);
         setActiveStep('lost');
-        saveStatus.textContent = 'Oportunidade marcada como perdida.';
+        resetLeadFlow();
+        closeDrawerFn();
       });
 
       approveProposal.addEventListener('click', () => {
@@ -1031,6 +1203,9 @@
         setTimeout(() => {
           loadingOverlay.classList.add('hidden');
           approveProposal.disabled = false;
+          const docKey = getCurrentDocKey();
+          removeProposalCardByDoc(docKey);
+          registerCreditedModelCard();
           showCreditedStep();
           saveStatus.textContent = 'Cliente credenciado com sucesso (protótipo).';
         }, 5000);
