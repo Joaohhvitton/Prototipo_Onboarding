@@ -10,13 +10,14 @@
       href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+      <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32-removebg-preview.png">
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32-removebg-preview.png">
   </head>
   <body>
     <div class="layout">
       <aside class="sidebar">
         <div class="brand">
+          <!-- Substitua aqui pela sua imagem de logo lateral: src="assets/sua-logo-sidebar.png" -->
           <img class="brand-image" src="img_logo.png" alt="Logo lateral" />
         </div>
         <nav>
@@ -226,7 +227,7 @@
                     <div class="offer-header">
                       <h4><strong>Antecipação Automática</strong></h4>
                       <!-- Substitua aqui pelo logo da oferta: src="assets/seu-logo-redeflex.png" -->
-                      <img class="offer-logo" src="assets/terminal-redeflex.svg" alt="Logo da oferta" />
+                      <img class="offer-logo" src="Logo_png-removebg-preview.png" alt="Logo da oferta" />
                     </div>
 
                     <ul class="offer-feature-list">
@@ -364,8 +365,8 @@
               <details class="qual-section" open>
                 <summary>Dados do cliente</summary>
                 <div class="proposal-form-grid">
-                  <label>CPF<input type="text" placeholder="Preencha com CPF" /></label>
-                  <label>Email do cliente<input type="email" placeholder="Preencha o email" /></label>
+                  <label>CPF<input id="customerCpf" type="text" placeholder="Preencha com CPF" /></label>
+                  <label>Email do cliente<input id="customerEmail" type="email" placeholder="Preencha o email" /></label>
                   <label>Data de nascimento<input type="text" placeholder="dd / mm / aaaa" /></label>
                   <label>Ocupação<input type="text" placeholder="Informe a ocupação" /></label>
                   <label>Renda mensal<input type="text" placeholder="Informe a renda" /></label>
@@ -381,8 +382,8 @@
                   <label>Cidade<input id="customerCity" type="text" placeholder="Preencha a cidade" /></label>
                   <label>Bairro<input id="customerDistrict" type="text" placeholder="Preencha o bairro" /></label>
                   <label>Logradouro<input id="customerStreet" type="text" placeholder="Preencha o logradouro" /></label>
-                  <label>Número<input type="text" placeholder="Preencha o número" /></label>
-                  <label>Complemento<input type="text" placeholder="Preencha o complemento" /></label>
+                  <label>Número<input id="customerNumber" type="text" placeholder="Preencha o número" /></label>
+                  <label>Complemento<input id="customerComplement" type="text" placeholder="Preencha o complemento" /></label>
                   <label>Referência<input type="text" placeholder="Preencha a referência" /></label>
                 </div>
               </details>
@@ -469,9 +470,10 @@
                     Endereço
                   </h4>
                   <p><strong>CEP:</strong> <span id="credCep">32242270</span></p>
-                  <p><strong>Cidade:</strong> Belo Horizonte</p>
-                  <p><strong>UF:</strong> MG</p>
-                  <p><strong>Bairro:</strong> Centro</p>
+                  <p><strong>Cidade:</strong> <span id="credCity">-</span></p>
+                  <p><strong>UF:</strong> <span id="credState">-</span></p>
+                  <p><strong>Bairro:</strong> <span id="credDistrict">-</span></p>
+                  <p><strong>Logradouro:</strong> <span id="credStreet">-</span></p>
                   <!-- Ícone da seção Endereço: aqui você pode inserir o ícone/mapa desejado -->
                 </article>
 
@@ -479,10 +481,11 @@
                   <h4>
                     <span class="credited-icon">🏦</span>
                     Conta
+                    <button id="toggleAccountData" class="icon-btn icon-btn--inline" type="button" aria-label="Exibir ou ocultar dados da conta">👁️</button>
                   </h4>
-                  <p><strong>Banco:</strong> **********</p>
-                  <p><strong>Agência:</strong> ****</p>
-                  <p><strong>Conta:</strong> ******-*</p>
+                  <p><strong>Banco:</strong> <span id="credBank">********</span></p>
+                  <p><strong>Agência:</strong> <span id="credAgency">****</span></p>
+                  <p><strong>Conta:</strong> <span id="credAccount">******-*</span></p>
                   <p><strong>Status:</strong> Liberado para instalação</p>
                   <!-- Ícone da seção Conta/Banco: substitua o emoji por imagem de banco quando desejar -->
                 </article>
@@ -587,7 +590,18 @@
       const proposalProduct = document.getElementById('proposalProduct');
       const credDoc = document.getElementById('credDoc');
       const credOwner = document.getElementById('credOwner');
+      const credCpf = document.getElementById('credCpf');
+      const credEmail = document.getElementById('credEmail');
       const credPhone = document.getElementById('credPhone');
+      const credCep = document.getElementById('credCep');
+      const credCity = document.getElementById('credCity');
+      const credState = document.getElementById('credState');
+      const credDistrict = document.getElementById('credDistrict');
+      const credStreet = document.getElementById('credStreet');
+      const credBank = document.getElementById('credBank');
+      const credAgency = document.getElementById('credAgency');
+      const credAccount = document.getElementById('credAccount');
+      const toggleAccountData = document.getElementById('toggleAccountData');
       const credBranch = document.getElementById('credBranch');
       const credSeller = document.getElementById('credSeller');
       const creditedHeader = document.getElementById('creditedHeader');
@@ -600,11 +614,15 @@
       const approveProposal = document.getElementById('approveProposal');
       const loadingOverlay = document.getElementById('loadingOverlay');
       const loadingMessage = document.getElementById('loadingMessage');
+      const customerCpf = document.getElementById('customerCpf');
+      const customerEmail = document.getElementById('customerEmail');
       const customerCep = document.getElementById('customerCep');
       const customerState = document.getElementById('customerState');
       const customerCity = document.getElementById('customerCity');
       const customerDistrict = document.getElementById('customerDistrict');
       const customerStreet = document.getElementById('customerStreet');
+      const customerNumber = document.getElementById('customerNumber');
+      const customerComplement = document.getElementById('customerComplement');
       const bankSearch = document.getElementById('bankSearch');
       const bankSuggestions = document.getElementById('bankSuggestions');
       const bankStatus = document.getElementById('bankStatus');
@@ -624,6 +642,7 @@
       let currentStep = '1';
       let activeProposalDoc = '';
       let banksCache = [];
+      let showAccountSensitiveData = false;
 
       const setActiveStep = (step) => {
         currentStep = step;
@@ -679,6 +698,33 @@
 
       const getCurrentDocKey = () => doc.value.replace(/\D/g, '');
       const getFlowDisplayName = () => fantasy.value.trim() || legalName.value.trim() || 'Cliente';
+
+      const maskDigits = (value = '', visible = 2) => {
+        const clean = String(value || '');
+        if (!clean || clean.length <= visible) return clean || '-';
+        return `${'*'.repeat(Math.max(clean.length - visible, 2))}${clean.slice(-visible)}`;
+      };
+
+      const refreshCredAccountView = () => {
+        const bankLabel = bankSearch.value.trim() || '-';
+        const agency = `${bankBranch.value || ''}${bankBranchDigit.value ? '-' + bankBranchDigit.value : ''}`.trim() || '-';
+        const account = `${bankAccountNumber.value || ''}${bankAccountDigit.value ? '-' + bankAccountDigit.value : ''}`.trim() || '-';
+
+        if (showAccountSensitiveData) {
+          credBank.textContent = bankLabel;
+          credAgency.textContent = agency;
+          credAccount.textContent = account;
+          toggleAccountData.textContent = '🙈';
+          toggleAccountData.title = 'Ocultar dados da conta';
+        } else {
+          credBank.textContent = maskDigits(bankLabel, 3);
+          credAgency.textContent = maskDigits(agency, 1);
+          credAccount.textContent = maskDigits(account, 1);
+          toggleAccountData.textContent = '👁️';
+          toggleAccountData.title = 'Exibir dados da conta';
+        }
+      };
+
 
       const syncLeadCount = () => {
         const total = leadList.querySelectorAll('.open-lead-card[data-doc]').length;
@@ -797,6 +843,10 @@
         customerCity.value = '';
         customerDistrict.value = '';
         customerStreet.value = '';
+        customerCpf.value = '';
+        customerEmail.value = '';
+        customerNumber.value = '';
+        customerComplement.value = '';
         bankSearch.value = '';
         bankStatus.textContent = '';
         bankAccountType.value = 'conta-corrente';
@@ -927,9 +977,17 @@
         creditedHeader.textContent = `${displayName.toUpperCase()} - ${doc.value || '-'}`;
         credDoc.textContent = doc.value || '-';
         credOwner.textContent = fullName.value || '-';
+        credCpf.textContent = customerCpf.value || '-';
+        credEmail.textContent = customerEmail.value || '-';
         credPhone.textContent = phone.value || '-';
+        credCep.textContent = customerCep.value || '-';
+        credCity.textContent = customerCity.value || '-';
+        credState.textContent = customerState.value || '-';
+        credDistrict.textContent = customerDistrict.value || '-';
+        credStreet.textContent = customerStreet.value ? `${customerStreet.value}${customerNumber.value ? ', ' + customerNumber.value : ''}${customerComplement.value ? ' - ' + customerComplement.value : ''}` : '-';
         credBranch.textContent = branchUf.value || getFilialByDdd(phone.value);
         credSeller.textContent = sellerName.value || "-";
+        refreshCredAccountView();
       };
 
       const openDrawer = (step = '1') => {
@@ -1046,6 +1104,11 @@
         const card = event.target.closest('.open-credited-card');
         if (!card) return;
         openDrawer('4');
+      });
+
+      toggleAccountData.addEventListener('click', () => {
+        showAccountSensitiveData = !showAccountSensitiveData;
+        refreshCredAccountView();
       });
 
       doc.addEventListener('input', () => {
