@@ -268,6 +268,16 @@ body {
   font-family: inherit;
 }
 
+.icon-btn--inline {
+  margin-left: auto;
+  font-size: 0.95rem;
+  border: 1px solid #d7dce4;
+  border-radius: 8px;
+  padding: 2px 8px;
+  color: #364355;
+  background: #fff;
+}
+
 .stepper {
   list-style: none;
   margin: 0;
