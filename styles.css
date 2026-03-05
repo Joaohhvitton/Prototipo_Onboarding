@@ -368,8 +368,9 @@ body {
 .person-type-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
 .radio-chip--person { border: 1px solid #cfd4df; background: #fff; color: #313b4d; }
 .radio-chip--person input { accent-color: #7f1320; }
-.doc-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: stretch; }
+.doc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 168px; gap: 8px; align-items: stretch; }
 .doc-grid--single { max-width: 100%; }
+#docLookup { height: 42px; white-space: nowrap; }
 
 
 .lead-form__doc .input-wrap { width: 100%; }
@@ -1156,6 +1157,7 @@ body {
   .qual-grid,
   .offers-grid { grid-template-columns: 1fr; }
   .doc-grid { grid-template-columns: 1fr; }
+  #docLookup { width: 100%; }
   .simulate-layout,
   .proposal-form-grid,
   .simulate-machine__grid { grid-template-columns: 1fr; }
@@ -1265,6 +1267,8 @@ body {
 
 
 .footer-actions { display: flex; gap: 8px; }
+#confirmActions { align-items: center; }
+#confirmActions .btn { min-height: 42px; }
 
 .btn:disabled { opacity: 0.65; cursor: not-allowed; }
 
