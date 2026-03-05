@@ -331,6 +331,7 @@ body {
   display: grid;
   grid-template-columns: repeat(4, minmax(160px, 1fr));
   gap: 10px;
+  align-items: start;
 }
 
 .lead-form label {
@@ -364,8 +365,15 @@ body {
   box-shadow: 0 0 0 3px rgba(127, 19, 32, 0.12);
 }
 
-.doc-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.person-type-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.radio-chip--person { border: 1px solid #cfd4df; background: #fff; color: #313b4d; }
+.radio-chip--person input { accent-color: #7f1320; }
+.doc-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: stretch; }
+.doc-grid--single { max-width: 100%; }
 
+
+.lead-form__doc .input-wrap { width: 100%; }
+.lead-form__doc .input-wrap input { width: 100%; }
 
 .qual-section {
   border: 1px solid #d8dbe1;
@@ -475,6 +483,25 @@ body {
 
 .offer-card--model {
   position: relative;
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.offer-card--model:hover {
+  border-color: #c7ceda;
+  box-shadow: 0 10px 20px rgba(26, 36, 53, 0.08);
+}
+
+.offer-card--model:focus-visible {
+  outline: none;
+  border-color: #7f1320;
+  box-shadow: 0 0 0 3px rgba(127, 19, 32, 0.2);
+}
+
+.offer-card--selected {
+  border-color: #7f1320;
+  box-shadow: 0 0 0 2px rgba(127, 19, 32, 0.15);
+  transform: translateY(-2px);
 }
 
 .offer-badge {
@@ -692,6 +719,53 @@ body {
   display: block;
 }
 
+
+.rate-input {
+  border: 1px solid transparent;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  border-radius: 6px;
+  padding: 2px 4px;
+  width: 100%;
+}
+
+.rate-input:disabled {
+  opacity: 1;
+  color: inherit;
+}
+
+.rate-input:not(:disabled) {
+  border-color: #d7dde7;
+  background: #fff;
+}
+
+.rate-input--approved {
+  border-color: #4caf7a !important;
+  background: #ebf8ef !important;
+}
+
+.rate-input--rejected {
+  border-color: #d96c6c !important;
+  background: #fdecec !important;
+}
+
+.rate-customizer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rate-customizer__toggle {
+  font-size: 0.86rem;
+  color: #49566a;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .simulate-card--aside { display: grid; gap: 8px; align-content: start; }
 .simulate-kv {
   display: flex;
@@ -864,6 +938,9 @@ body {
   padding: 6px 10px;
   font-size: 0.85rem;
   color: #4e5868;
+  background: #fff;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .radio-chip.active { background: #e8f7ef; border-color: #7bc49b; color: #287f53; }
@@ -872,6 +949,10 @@ body {
   padding: 0 12px 12px;
   display: flex;
   gap: 10px;
+}
+
+.hours-time--custom {
+  padding-top: 0;
 }
 
 .hours-time label {
@@ -1145,9 +1226,20 @@ body {
     justify-self: end;
   }
 
+  .drawer-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .api-status {
+    width: 100%;
+    min-height: 0;
+    order: 3;
+  }
+
   .footer-actions {
     width: 100%;
     flex-direction: column;
+    order: 1;
   }
   .footer-actions .btn {
     width: 100%;
